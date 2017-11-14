@@ -1,6 +1,6 @@
 import {WebGLUtils} from "./GL/webgl-utils.js";
 import {gl} from "../game.js";
-import {vec3} from "../Utilitiy/GL/gl-matrix.js";
+import {vec3} from ".//GL/gl-matrix.js";
 
 export default  class Canvas {
 

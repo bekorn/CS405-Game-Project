@@ -1,4 +1,4 @@
-import {glMatrix, vec3, mat4, quat} from "../Utilitiy/GL/gl-matrix.js";
+import {glMatrix, vec3, mat4, quat} from ".//GL/gl-matrix.js";
 import M_Object from "../Object/M_object";
 
 /*

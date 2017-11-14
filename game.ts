@@ -1,12 +1,12 @@
-import Canvas from "./Utilitiy/canvas.js";
-import {requestAnimFrame} from "./Utilitiy/GL/webgl-utils.js";
+import Canvas from "./Utility/canvas.js";
+import {requestAnimFrame} from "./Utility/GL/webgl-utils.js";
 import M_Object from "./Object/M_object.js";
 import Scene from "./Object/Singleton/Scene.js";
 import Camera from "./Object/Singleton/Camera.js";
-import {glMatrix, mat4, vec3} from "./Utilitiy/GL/gl-matrix.js";
+import {glMatrix, mat4, vec3} from "./Utility/GL/gl-matrix.js";
 import {Circle} from "./Shape/circle.js";
 import Axes from "./Object/Axes.js";
-import SimpleShader from "./Utilitiy/Shader/simple_shader.js";
+import SimpleShader from "./Utility/Shader/simple_shader.js";
 import RectangularPrism from "./Shape/rectangular_prism.js";
 
 export let gl : WebGLRenderingContext;

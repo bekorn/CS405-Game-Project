@@ -1,6 +1,6 @@
 import M_Shape from "./M_shape.js";
-import {glMatrix, vec3, mat4} from "../Utilitiy/GL/gl-matrix.js";
-import M_Shader from "../Utilitiy/Shader/M_shader.js";
+import {glMatrix, vec3, mat4} from "../Utility/GL/gl-matrix.js";
+import M_Shader from "../Utility/Shader/M_shader.js";
 import {gl, camera, projection_matrix} from "../game.js";
 
 export default class RectangularPrism extends M_Shape {

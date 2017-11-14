@@ -1,7 +1,7 @@
 import {gl} from "../game.js";
 import M_Shape from "./M_shape.js";
-import {vec3, mat4} from "../Utilitiy/GL/gl-matrix.js";
-import M_Shader from "../Utilitiy/Shader/M_shader";
+import {vec3, mat4} from "../Utility/GL/gl-matrix.js";
+import M_Shader from "../Utility/Shader/M_shader";
 
 export class Circle extends M_Shape {
 

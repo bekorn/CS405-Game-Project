@@ -1,5 +1,0 @@
-export class Controller {
-
-    static
-
-}
