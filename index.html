@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta charset="UTF-8">
+	<title>CS 405</title>
+
+	<link rel="stylesheet" href="./style.css">
+
+	<script id="vertex-shader-complex" type="x-shader/x-vertex">
+		precision highp float;
+		attribute vec3 position;
+		attribute vec3 normal;
+		uniform mat3 normalMatrix;
+		uniform mat4 modelViewMatrix;
+		uniform mat4 projectionMatrix;
+		varying vec3 fNormal;
+		varying vec3 fPosition;
+
+		void main()
+		{
+			fNormal = normalize( normalMatrix * normal );
+			vec4 pos = modelViewMatrix * vec4( position, 1.0 );
+			fPosition = pos.xyz;
+			gl_Position = projectionMatrix * pos;
+		}
+	</script>
+	<script id="fragment-shader-complex" type="x-shader/x-fragment">
+		precision highp float;
+		uniform float time;
+		uniform vec2 resolution;
+		varying vec3 fPosition;
+		varying vec3 fNormal;
+
+		void main()
+		{
+			gl_FragColor = vec4(fNormal, 1.0);
+		}
+    </script>
+
+	<script type="module" src="game.js"></script>
+
+</head>
+<body>
+
+	<canvas id="gl-canvas">
+		Oops ... your browser doesn't support the HTML5 canvas element
+	</canvas>
+
+</body>
+</html>

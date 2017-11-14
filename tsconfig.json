@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "module": "es2015",
+    "target": "es2015",
+    "sourceMap": false,
+    "allowJs": true
+  }
+}
