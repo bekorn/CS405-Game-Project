@@ -55,15 +55,6 @@ export default abstract class M_Shape {
         // gl.bindBuffer( gl.ARRAY_BUFFER, null );
     }
 
-    protected fit_to_canvas( raw_vertices: vec3[] ) : vec3[] {
-        return raw_vertices.map( (vertex) => {
-            vertex[0] *= 2 / canvas.width;
-            vertex[1] *= 2 / canvas.height;
-            vertex[2] *= 2 / canvas.depth;
-            return vertex;
-        })
-    }
-
     protected apply_dimensions( vertices: vec3[], dimensions: vec3 ) {
         return vertices.map( (vertex) => {
             return vec3.multiply( vertex, vertex, dimensions );

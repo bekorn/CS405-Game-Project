@@ -34,12 +34,10 @@ export default class SimpleShader extends M_Shader {
                 float local = 4.0;
                 float global = 0.0;
                 
-                vec4 valOfLocal = (2.4 * originalPosition + 0.5)
-                                * (2.4 * originalPosition + 0.5)
-                                * (2.4 * originalPosition + 0.5)
-                                * (2.4 * originalPosition + 0.5)
-                                * (2.4 * originalPosition + 0.5)
-                                * (2.4 * originalPosition + 0.5);
+                vec4 valOfLocal = (0.01 * originalPosition + 0.4)
+                                * (0.01 * originalPosition + 0.4)
+                                * (0.01 * originalPosition + 0.4)
+                                * (0.01 * originalPosition + 0.4);
                                     
                 vec4 valOfGlobal = projectedPosition;
                 

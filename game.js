@@ -43,32 +43,32 @@ function setup_game() {
     //  Currently not working because the models have some problems
     // gl.enable(gl.CULL_FACE);
     //  Set the projection matrix
-    projection_matrix = mat4.perspective(mat4.create(), glMatrix.toRadian(45), canvas.width / canvas.height, 0.01, 10);
+    projection_matrix = mat4.perspective(mat4.create(), glMatrix.toRadian(45), canvas.width / canvas.height, 1, 1200);
     //  Initialize the camera
-    const eye = canvas.to_gl(600, 300, 1000);
-    const target = canvas.to_gl(0, 0, 0);
+    const eye = vec3.fromValues(400, 400, 500);
+    const target = vec3.fromValues(0, 0, 0);
     camera = new Camera(eye, target);
     attach_to_loop(camera);
-    //  Initialize the scene
-    scene = new Scene(new SimpleShader(), vec3.fromValues(-0.5, 0, 0));
-    console.log("Setup Completed");
     const shader = new SimpleShader();
+    //  Initialize the scene
+    scene = new Scene(shader, vec3.fromValues(0, 0, 0));
+    console.log("Setup Completed");
     const main_axes = new Axes(shader, vec3.fromValues(0, 0, 0));
     mat4.scale(main_axes.model, main_axes.model, vec3.fromValues(0.16, 0.16, 0.16));
     scene.add_child(main_axes);
     // attach_to_loop( main_axes );
-    //  Test Objects
+    // Test Objects
     const sat_1 = new Axes(shader, vec3.fromValues(0, 0, 0));
     sat_1.scale_shapes(vec3.fromValues(0.1, 0.1, 0.1));
-    scene.add_child(sat_1, canvas.to_gl(0, 250, 0));
+    scene.add_child(sat_1, vec3.fromValues(0, 250, 0));
     attach_to_loop(sat_1);
     const sat_2 = new Axes(shader, vec3.fromValues(0, 0, 0));
     sat_2.scale_shapes(vec3.fromValues(0.06, 0.06, 0.06));
-    sat_1.add_child(sat_2, canvas.to_gl(0, 150, 0));
+    sat_1.add_child(sat_2, vec3.fromValues(0, 150, 0));
     attach_to_loop(sat_2);
     const sat_3 = new Axes(shader, vec3.fromValues(0, 0, 0));
     sat_3.scale_shapes(vec3.fromValues(0.04, 0.04, 0.04));
-    sat_2.add_child(sat_3, canvas.to_gl(0, 50, 0));
+    sat_2.add_child(sat_3, vec3.fromValues(0, 50, 0));
     attach_to_loop(sat_3);
     camera.follow(sat_1);
     //  start game loop

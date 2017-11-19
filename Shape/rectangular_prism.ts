@@ -51,8 +51,8 @@ export default class RectangularPrism extends M_Shape {
 
         //  Prepare Vertices
         let raw_vertices = this.vertices();
-        raw_vertices = this.fit_to_canvas( raw_vertices );
         raw_vertices = this.apply_dimensions( raw_vertices, vec3.scale( vec3.create(), dimensions, 0.5 ) );
+
         const vertices : Float32Array = new Float32Array( raw_vertices.length * 3 );
         for( let i=0 ; i < raw_vertices.length ; i++ ) {
             vertices[i*3  ] = raw_vertices[i][0];
