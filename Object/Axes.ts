@@ -23,6 +23,8 @@ export default class Axes extends M_Object {
         //  Rotate around origin
         quat.rotateZ( this.model.rotation_g, this.model.rotation_g, glMatrix.toRadian( 0.5 ) );
 
+        
+
         // console.log( this.id +"'s Translation => "+ vec3.str( mat4.getTranslation( vec3.create(), this.model ) ) );
     }
 }

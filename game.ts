@@ -7,6 +7,7 @@ import {glMatrix, mat4, vec3} from "./Utility/GL/gl-matrix.js";
 import Axes from "./Object/Axes.js";
 import SimpleShader from "./Utility/Shader/simple_shader.js";
 import RectangularPrism from "./Mesh/rectangular_prism.js";
+import {Controller} from "./Utility/Controller.js";
 
 export let gl : WebGLRenderingContext;
 export let canvas : Canvas;
@@ -55,7 +56,7 @@ function setup_game() {
     //  TODO: This option enables the culling for triangles that not looking at the camera
     //  Currently not working because the models have some problems
     // gl.enable(gl.CULL_FACE);
-
+    Controller.init_controller();
     //  Set the projection matrix
     projection_matrix = mat4.perspective( mat4.create(), glMatrix.toRadian(45), canvas.width / canvas.height, 1, 1200 );
 

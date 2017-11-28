@@ -59,8 +59,10 @@ export default class Model {
     translate( v3 : vec3 )
     {
         let relative : vec3 = vec3.create();
-        vec3.divide( relative, v3, this.scale_p );
-        vec3.add( this.translation_g, this.translation_g, relative );
+        // vec3.divide( relative, v3, this.scale_p );
+        vec3.add( this.translation_g, this.translation_g, v3 );
+
+        vec3.add(this.origin, this.origin, v3);
         //
         // vec3.add( this.translation_g, this.translation_g, v3 );
     }
