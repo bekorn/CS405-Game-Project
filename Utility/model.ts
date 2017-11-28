@@ -1,70 +1,67 @@
-import {glMatrix, vec3, mat4, quat} from ".//GL/gl-matrix.js";
-import M_Object from "../Object/M_object";
+import {glMatrix, vec3, mat4, quat} from "./GL/gl-matrix.js";
+import M_Object from "../Object/M_Object";
 
 /*
     Multiplying from left is local,
     Multiplying from right is global
- */
+*/
 
 export default class Model {
 
-    belongs_to : M_Object;
+    belongs_to : any;
 
-    origin: vec3;
+    //  Local
+    origin : vec3 = vec3.fromValues(0,0,0);
+    rotation : quat = quat.fromEuler( quat.create(),0,0,0);
+    scale : vec3 = vec3.fromValues(1,1,1);
 
-    translation_L: vec3 = vec3.create();
-    rotation_L: vec3 = vec3.create();
-    scale_L: vec3 = vec3.fromValues(1,1,1);
+    //  Global (relative to parent)
+    translation_g : vec3 = vec3.fromValues(0,0,0);
+    rotation_g : quat = quat.fromEuler( quat.create(),0,0,0);
 
-    translation_G: vec3 = vec3.create();
-    rotation_G: vec3 = vec3.create();
-    scale_G: vec3 = vec3.fromValues(1,1,1);
+    //  Parent
+    origin_p : vec3 = vec3.fromValues(0,0,0);
+    scale_p : vec3 = vec3.fromValues(1,1,1);
 
-    rotate_around_self_X( angle : number ) {
-        this.self_rotation[0] += angle;
-
-        mat4.fromRotationTranslationScaleOrigin()
-
-        mat4.rotateX( this.model, this.model, angle );
+    constructor( obj : any ) {
+        this.belongs_to = obj;
     }
 
-    rotate_around_self_Y( angle : number ) {
-        this.self_rotation[1] += angle;
-        mat4.rotateY( this.model, this.model, angle );
+    get_model() : mat4 {
+        // console.log( this.belongs_to, this.belongs_to.parent );
+
+        const local = mat4.create();
+        mat4.fromRotationTranslationScaleOrigin( local, this.rotation, this.translation_g, vec3.fromValues(1,1,1), this.origin );
+
+        const global = mat4.create();
+        mat4.fromRotationTranslationScaleOrigin( global, this.rotation_g, vec3.fromValues(0,0,0), this.scale, this.origin_p );
+
+        return mat4.multiply( mat4.create(), local, global );
     }
 
-    rotate_around_self_Z( angle : number ) {
-        this.self_rotation[2] += angle;
-        mat4.rotateZ( this.model, this.model, angle );
+    get_model_qwe() : mat4 {
+        // console.log( this.belongs_to, this.belongs_to.parent );
+
+        const local = mat4.create();
+        const rotation = mat4.fromQuat( mat4.create(), quat.fromEuler( quat.create(), this.rotation[0], this.rotation[1], this.rotation[2] ) );
+        const scale = mat4.fromScaling( mat4.create(), this.scale );
+
+        mat4.multiply( local, rotation, scale );
+
+
+        const global = mat4.create();
+        const translation = mat4.fromTranslation( mat4.create(), this.translation_g );
+        const rotation_g = mat4.fromQuat( mat4.create(), quat.fromEuler( quat.create(), this.rotation_g[0], this.rotation_g[1], this.rotation_g[2] ) );
+
+        return mat4.multiply( mat4.create(), local, global );
     }
 
-    rotate_around_global( v3 : vec3 ) {
-        vec3.add( this.global_rotation, this.global_rotation, v3 );
-        //  this.model * RotationX * RotationY * RotationZ
-        mat4.multiply( this.model,
-            mat4.multiply( mat4.create(),
-                this.model,
-                mat4.fromXRotation( mat4.create(), v3[0] )
-            ),
-            mat4.multiply( mat4.create(),
-                mat4.fromYRotation( mat4.create(), v3[1] ),
-                mat4.fromZRotation( mat4.create(), v3[2] )
-            )
-        );
-    }
-
-    rotate_around_global_X( angle : number ) {
-        this.global_rotation[0] += angle;
-        mat4.rotateX( this.model, this.model, angle );
-    }
-
-    rotate_around_global_Y( angle : number ) {
-        this.global_rotation[1] += angle;
-        mat4.rotateY( this.model, this.model, angle );
-    }
-
-    rotate_around_global_Z( angle : number ) {
-        this.global_rotation[2] += angle;
-        mat4.rotateZ( this.model, this.model, angle );
+    translate( v3 : vec3 )
+    {
+        let relative : vec3 = vec3.create();
+        vec3.divide( relative, v3, this.scale_p );
+        vec3.add( this.translation_g, this.translation_g, relative );
+        //
+        // vec3.add( this.translation_g, this.translation_g, v3 );
     }
 }

@@ -28,30 +28,6 @@ export default  class Canvas {
         return tempgl;
     }
 
-    to_gl( ...coordinates : number[] ) {
-        return vec3.fromValues(
-            coordinates[0] / this.width,
-            coordinates[1] / this.height,
-            coordinates[2] / this.depth
-        );
-    }
-
-    from_gl(...coordinates : number[] ) {
-        return vec3.fromValues(
-            coordinates[0] * this.width,
-            coordinates[1] * this.height,
-            coordinates[2] * this.depth
-        );
-    }
-
-    // to_gl( x : number, y : number, z : number ) {
-    //     return vec3.fromValues(
-    //         x / this.width,
-    //         y / this.height,
-    //         z / this.depth
-    //     );
-    // }
-
     refresh() {
         let window_width = document.documentElement.clientWidth;
         let window_height = document.documentElement.clientHeight;

@@ -1,13 +1,12 @@
 import Canvas from "./Utility/canvas.js";
 import {requestAnimFrame} from "./Utility/GL/webgl-utils.js";
-import M_Object from "./Object/M_object.js";
+import M_Object from "./Object/M_Object.js";
 import Scene from "./Object/Singleton/Scene.js";
 import Camera from "./Object/Singleton/Camera.js";
 import {glMatrix, mat4, vec3} from "./Utility/GL/gl-matrix.js";
-import {Circle} from "./Shape/circle.js";
 import Axes from "./Object/Axes.js";
 import SimpleShader from "./Utility/Shader/simple_shader.js";
-import RectangularPrism from "./Shape/rectangular_prism.js";
+import RectangularPrism from "./Mesh/rectangular_prism.js";
 
 export let gl : WebGLRenderingContext;
 export let canvas : Canvas;
@@ -75,29 +74,32 @@ function setup_game() {
     console.log("Setup Completed");
 
     const main_axes = new Axes( shader, vec3.fromValues(0,0,0) );
-    mat4.scale( main_axes.model, main_axes.model, vec3.fromValues(0.16, 0.16, 0.16) );
-    scene.add_child( main_axes );
+    vec3.scale( main_axes.model.scale, main_axes.model.scale, 0.1 );
+    scene.add_child( main_axes, vec3.fromValues(0, 0, 0 )  );
     // attach_to_loop( main_axes );
-
+    console.log( main_axes.model );
 
     // Test Objects
     const sat_1 = new Axes( shader, vec3.fromValues(0,0,0) );
-    sat_1.scale_shapes( vec3.fromValues(0.1, 0.1, 0.1) );
-    scene.add_child( sat_1, vec3.fromValues(0, 250, 0 ) );
+    vec3.scale( sat_1.model.scale, sat_1.model.scale, 0.1 );
+    scene.add_child( sat_1, vec3.fromValues(0, 100, 0 ) );
     attach_to_loop( sat_1 );
+    console.log( "sat_1", sat_1.model );
 
     const sat_2 = new Axes( shader, vec3.fromValues(0,0,0) );
-    sat_2.scale_shapes( vec3.fromValues(0.06, 0.06, 0.06) );
-    sat_1.add_child( sat_2, vec3.fromValues( 0, 150, 0 ) );
+    vec3.scale( sat_2.model.scale, sat_2.model.scale, 0.5 );
+    sat_1.add_child( sat_2, vec3.fromValues( 0, 200, 0 ) );
     attach_to_loop( sat_2 );
+    console.log( "sat_2", sat_2.model );
 
     const sat_3 = new Axes( shader, vec3.fromValues(0,0,0) );
-    sat_3.scale_shapes( vec3.fromValues(0.04, 0.04, 0.04) );
-    sat_2.add_child( sat_3, vec3.fromValues( 0, 50, 0 ) );
+    vec3.scale( sat_3.model.scale, sat_3.model.scale, 0.5 );
+    sat_2.add_child( sat_3, vec3.fromValues( 0, 300, 0 ) );
     attach_to_loop( sat_3 );
+    console.log( "sat_3", sat_3.model );
 
 
-    camera.follow( sat_1 );
+    // camera.follow( main_axes );
 
     //  start game loop
     game_loop();

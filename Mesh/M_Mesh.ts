@@ -1,18 +1,21 @@
-import {canvas, gl} from "../game.js";
 import {vec3, mat4} from "../Utility/GL/gl-matrix.js";
-import M_Shader from "../Utility/Shader/M_shader";
+import M_Shader from "../Utility/Shader/M_shader.js";
+import Model from "../Utility/model.js";
+import M_Object from "../Object/M_Object.js";
 
-export default abstract class M_Shape {
+export default abstract class M_Mesh {
 
     static id : number = 0;
-    id : number = M_Shape.id++;
+    id : number = M_Mesh.id++;
 
+    parent : M_Object = null;
     shader : M_Shader;
+
     vao : WebGLBuffer;
     vao_attr : number;
     ebo : WebGLBuffer;
     indice_size : number;
-    model : mat4;
+    model : Model = new Model( this );
 
     abstract vertices() : vec3[];
 

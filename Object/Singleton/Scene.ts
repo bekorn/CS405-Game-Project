@@ -6,10 +6,16 @@ export default class Scene extends M_Object {
 
     constructor( shader: M_Shader, origin: vec3 ) {
         super( shader, origin );
-        mat4.translate( this.model, this.model, this.origin );
+
+        this.model.origin = origin;
+        this.model.origin_p = vec3.fromValues(0,0,0);
+        this.model.scale_p = vec3.fromValues(1,1,1);
     }
 
     draw( view_matrix : mat4 ) {
-        super.draw( mat4.clone( view_matrix ) );
+
+        const model = mat4.clone( view_matrix );
+
+        super.draw( model );
     }
 }

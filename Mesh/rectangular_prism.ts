@@ -1,9 +1,9 @@
-import M_Shape from "./M_shape.js";
+import M_Mesh from "./M_Mesh.js";
 import {glMatrix, vec3, mat4} from "../Utility/GL/gl-matrix.js";
 import M_Shader from "../Utility/Shader/M_shader.js";
 import {gl, camera, projection_matrix} from "../game.js";
 
-export default class RectangularPrism extends M_Shape {
+export default class RectangularPrism extends M_Mesh {
 
     vertices(): vec3[] {
         return [
@@ -36,9 +36,8 @@ export default class RectangularPrism extends M_Shape {
 
         // this.scale = scale;
 
-        this.model = mat4.create();
-        mat4.rotateZ( this.model, this.model, glMatrix.toRadian(0.1) );
-        mat4.rotateX( this.model, this.model, glMatrix.toRadian(0.14) );
+        this.model.rotation[2] += glMatrix.toRadian(0.1);
+        this.model.rotation[0] += glMatrix.toRadian(0.14);
 
         // mat4.scale( this.model, this.model, scale );
 
@@ -85,7 +84,7 @@ export default class RectangularPrism extends M_Shape {
 
         super.draw( model );
 
-        mat4.multiply( model, model, this.model );
+        mat4.multiply( model, model, this.model.get_model() );
 
         gl.useProgram( this.shader.program );
 
