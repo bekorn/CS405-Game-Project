@@ -5,8 +5,10 @@ import M_Shader from "../Utility/Shader/M_shader.js";
 
 export default class Axes extends M_Object {
 
-    constructor( shader: M_Shader, origin: vec3  ) {
-        super( shader, origin );
+    constructor( shader: M_Shader, parent : M_Object ) {
+        super( shader );
+
+        parent.add_child( this );
 
         this.add_mesh( new RectangularPrism( this.shader, vec3.fromValues(100, 100, 100) ) );
         this.add_mesh( new RectangularPrism( this.shader, vec3.fromValues(350, 50, 50) ) );
@@ -17,12 +19,12 @@ export default class Axes extends M_Object {
     update() {
         //  Rotate around self
         for (let mesh of this.meshes) {
-            quat.rotateX( mesh.model.rotation, mesh.model.rotation, glMatrix.toRadian(2) );
+            mesh.model.rotateX( 2 );
         }
 
         //  Rotate around origin
-        quat.rotateZ( this.model.rotation_g, this.model.rotation_g, glMatrix.toRadian( 0.5 ) );
+        this.model.rotate_globalZ( 0.5 );
 
-        // console.log( this.id +"'s Translation => "+ vec3.str( mat4.getTranslation( vec3.create(), this.model ) ) );
+        // console.log( this.id +"'s Origin => "+ vec3.str( this.model.global_position() ) );
     }
 }

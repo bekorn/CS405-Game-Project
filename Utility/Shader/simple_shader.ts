@@ -1,10 +1,12 @@
 import M_Shader from "./M_shader.js";
+import { gl } from "../../game";
 
 export default class SimpleShader extends M_Shader {
 
     vertex_shader() {
         return `
             precision highp float;
+            
             attribute vec3 aVertexPosition;
         
             uniform mat4 uModelViewMatrix;
@@ -14,7 +16,8 @@ export default class SimpleShader extends M_Shader {
             varying vec4 projectedPosition;
             
             void main() {
-                originalPosition = vec4(aVertexPosition,1);
+            
+                originalPosition = vec4(aVertexPosition,1.0);
                 
                 projectedPosition =  uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition,1);
                 
@@ -25,35 +28,32 @@ export default class SimpleShader extends M_Shader {
 
     fragment_shader() {
         return `
-            precision highp float;
+            precision mediump float;
             
             varying vec4 originalPosition;
             varying vec4 projectedPosition;
             
             void main() {
-                float local = 4.0;
-                float global = 0.0;
+                vec3 light = vec3( 1.0, 1.0, 1.0 );
                 
-                vec4 valOfLocal = (0.01 * originalPosition + 0.4)
-                                * (0.01 * originalPosition + 0.4)
-                                * (0.01 * originalPosition + 0.4)
-                                * (0.01 * originalPosition + 0.4);
-                                    
-                vec4 valOfGlobal = projectedPosition;
+                vec3 colour = pow( (originalPosition.xyz), vec3( 3.0 ) );
                 
-                vec3 result = valOfLocal.xyz * local
-                            + valOfGlobal.xyz * global;
-                
-                gl_FragColor = vec4( result / (local + global), 1.0 );
+                gl_FragColor = vec4( colour, 1.0 );
             }
         `;
     }
 
-    bindings: { [key: string]: any; };
+    binding_map : { [key: string]: any } = {
+        model_view : 'uModelViewMatrix',
+        projection : 'uProjectionMatrix',
+        position_attr : 'aVertexPosition'
+    };
 
     constructor() {
         super();
 
-        console.log( "New Shade created" );
+        this.bind_program();
+
+        console.log( "SimpleShader created" );
     }
 }

@@ -5,6 +5,7 @@ import M_Mesh from "../Mesh/M_Mesh.js";
 import M_Texture from "../Texture/M_Texture.js";
 import M_Material from "../Material/M_Material.js";
 import Model from "../Utility/model.js";
+import { scene } from "../game.js";
 
 export default abstract class M_Object {
 
@@ -21,37 +22,32 @@ export default abstract class M_Object {
     textrures : M_Texture[] = [];
     materials : M_Material[] = [];
 
-    constructor( shader: M_Shader, origin: vec3 ) {
+    constructor( shader: M_Shader, parent : M_Object = scene ) {
         this.shader = shader;
-        this.model.origin = origin;
     }
 
     add_child( obj: M_Object, relative_dist: vec3 = vec3.create() ) : void {
 
-        vec3.add( obj.model.origin_p, this.model.origin, this.model.translation_g );
-
-        let dist : vec3 = vec3.create();
-        vec3.add( dist, this.model.origin, relative_dist );
-        obj.model.translate( dist );
-
-        vec3.multiply( obj.model.scale_p, this.model.scale, this.model.scale_p );
-
         obj.parent = this;
+
+        obj.model.parent_model = this.model;
+
+        // vec3.multiply( obj.model.parent_scale, this.model.scale, this.model.parent_scale );
+
+        obj.model.translate_global( relative_dist );
 
         this.children.push( obj );
     }
 
     add_mesh( mesh : M_Mesh, relative_dist: vec3 = vec3.create() ) : void {
 
-        vec3.add( mesh.model.origin_p, this.model.origin, this.model.translation_g );
-
-        let dist : vec3 = vec3.create();
-        vec3.add( dist, this.model.origin, relative_dist );
-        mesh.model.translate( dist );
-
-        vec3.multiply( mesh.model.scale_p, this.model.scale, this.model.scale_p );
-
         mesh.parent = this;
+
+        mesh.model.parent_model = this.model;
+
+        // vec3.multiply( mesh.model.parent_scale, this.model.scale, this.model.parent_scale );
+
+        mesh.model.translate_global( relative_dist );
 
         this.meshes.push( mesh );
     }
