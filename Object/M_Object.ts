@@ -64,20 +64,18 @@ export default abstract class M_Object {
 
     }
 
-    draw( parent_model: mat4 ) : void {
+    async draw( parent_model: mat4 ) : Promise<any> {
 
         // console.log( "Drawing OBJECT:"+ this.id );
 
         let model = mat4.create();
         mat4.multiply( model, parent_model, this.model.get_model() );
 
-        for( let child of this.children ) {
-            child.draw( model );
-        }
+        //  Wait for all children to draw their meshes
+        await Promise.all( this.children.map( (child) => child.draw( model ) ) );
 
-        for( let mesh of this.meshes ) {
-            mesh.draw( model );
-        }
+        //  Draw your meshes asynchronously
+        return Promise.all( this.meshes.map( (mesh) => mesh.draw( model ) ) );
     }
 
 }

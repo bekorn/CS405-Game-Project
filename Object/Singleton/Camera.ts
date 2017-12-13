@@ -13,10 +13,10 @@ export default class Camera extends M_Object {
         super( null );
 
         this.target = target;
-        // mat4.lookAt( this.view_matrix, eye, target, vec3.fromValues(0,1,0) );
+        mat4.lookAt( this.view_matrix, eye, target, vec3.fromValues(0,1,0) );
 
-        const self_pos = vec3.add( vec3.fromValues(0,0,0), target, this.dist );
-        mat4.lookAt( this.view_matrix, self_pos, target, vec3.fromValues(0,1,0) );
+        // const self_pos = vec3.add( vec3.fromValues(0,0,0), target, this.dist );
+        // mat4.lookAt( this.view_matrix, self_pos, target, vec3.fromValues(0,1,0) );
     }
 
     follow( obj : M_Object ) : void {
@@ -28,20 +28,25 @@ export default class Camera extends M_Object {
             this.target = this.following.model.global_position();
         }
 
-        const self_pos = vec3.add( vec3.fromValues(0,0,0), this.target, this.dist );
-        mat4.lookAt( this.view_matrix, self_pos, this.target, vec3.fromValues(0,1,0) );
+        // const pos = this.model.global_position();
+        // mat4.lookAt( this.view_matrix, pos, vec3.add( vec3.fromValues(0,0,0), this.target, vec3.fromValues(0,pos[1]-200,0) ), vec3.fromValues(0,1,0) );
+
+        mat4.lookAt( this.view_matrix, this.model.global_position(), this.target, vec3.fromValues(0,1,0) );
+
+        // const self_pos = vec3.add( vec3.fromValues(0,0,0), this.target, this.dist );
+        // mat4.lookAt( this.view_matrix, self_pos, this.target, vec3.fromValues(0,1,0) );
 
         if (Controller.left == true) {
-            this.model.translate(vec3.fromValues(-10, 0, 0))
-        }
-        if (Controller.up == true) {
-            this.model.translate(vec3.fromValues(0, 10, 0))
+            this.model.rotate_globalY( -1 );
         }
         if (Controller.right == true) {
-            this.model.translate(vec3.fromValues(10, 0, 0))
+            this.model.rotate_globalY( 1 );
+        }
+        if (Controller.up == true) {
+            this.model.translate(vec3.fromValues(0, 6, 0));
         }
         if (Controller.down == true) {
-            this.model.translate(vec3.fromValues(0, -10, 0))
+            this.model.translate(vec3.fromValues(0, -6, 0));
         }
     }
 }

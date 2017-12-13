@@ -4,6 +4,7 @@ import M_Shader from "../../Utility/Shader/M_shader.js";
 import RectangularPrism from "../../Mesh/rectangular_prism.js";
 import Model from "../../Utility/model.js";
 import RootModel from "../../Utility/root_model.js";
+import DeerMesh from "../../Mesh/deer.js";
 
 export default class Scene extends M_Object {
 
@@ -13,12 +14,21 @@ export default class Scene extends M_Object {
         this.model.parent_model = new RootModel();
 
         // this.add_mesh( new RectangularPrism( shader, vec3.fromValues(1600, 10, 1600) ), vec3.fromValues( 0, -100, 0 ) );
+
+        this.add_mesh( new DeerMesh( shader, vec3.fromValues(0.16, 0.16, 0.16) ) );
     }
 
-    draw() {
+    update() {
+
+        for( const mesh of this.meshes ) {
+            mesh.model.rotateY( 1 );
+        }
+    }
+
+    async draw() {
         //  Initializes draw tree with its own model
         const model = mat4.clone( this.model.get_model() );
 
-        super.draw( model );
+        return super.draw( model );
     }
 }

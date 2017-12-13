@@ -18,7 +18,7 @@ export default class Model {
     scale : vec3 = vec3.fromValues(1,1,1);
 
     //  Global (relative to parent)
-    gloabl_rotation : quat = quat.fromEuler( quat.create(),0,0,0);
+    global_rotation : quat = quat.fromEuler( quat.create(),0,0,0);
 
     constructor( obj : any ) {
         this.belongs_to = obj;
@@ -37,7 +37,7 @@ export default class Model {
 
         //  Translate around parent
         mat4.translate( model, model, vec3.negate( vec3.create(), this.translation ) );
-        mat4.multiply( model, model, mat4.fromQuat(mat4.create(), this.gloabl_rotation) );
+        mat4.multiply( model, model, mat4.fromQuat(mat4.create(), this.global_rotation) );
         mat4.scale( model, model, this.scale );
         mat4.translate( model, model, this.translation );
 
@@ -146,25 +146,25 @@ export default class Model {
     }
 
     rotate_global( v3 : vec3 ) {
-        Model.rotate_quat( this.gloabl_rotation, v3 );
+        Model.rotate_quat( this.global_rotation, v3 );
 
         this.updated = true;
     }
 
     rotate_globalX( degree : number ) {
-        quat.rotateX( this.gloabl_rotation, this.gloabl_rotation, glMatrix.toRadian( degree ) );
+        quat.rotateX( this.global_rotation, this.global_rotation, glMatrix.toRadian( degree ) );
 
         this.updated = true;
     }
 
     rotate_globalY( degree : number ) {
-        quat.rotateY( this.gloabl_rotation, this.gloabl_rotation, glMatrix.toRadian( degree ) );
+        quat.rotateY( this.global_rotation, this.global_rotation, glMatrix.toRadian( degree ) );
 
         this.updated = true;
     }
 
     rotate_globalZ( degree : number ) {
-        quat.rotateZ( this.gloabl_rotation, this.gloabl_rotation, glMatrix.toRadian( degree ) );
+        quat.rotateZ( this.global_rotation, this.global_rotation, glMatrix.toRadian( degree ) );
 
         this.updated = true;
     }

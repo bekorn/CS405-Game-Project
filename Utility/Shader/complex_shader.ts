@@ -49,7 +49,7 @@ export default class ComplexShader extends M_Shader {
             
             void main() {
                 
-                vec3 material_colour = vec3( 0.0, 0.0, 0.4 );
+                vec3 material_colour = vec3( 0.423529412, 0.956862745, 0.274509804 );
                 vec3 light_colour = vec3( 1.0 );
                 vec3 result = vec3( 0.0 );
                 

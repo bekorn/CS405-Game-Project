@@ -1,26 +1,25 @@
-import M_Mesh from "./M_Mesh.js";
-import {glMatrix, vec3, mat4} from "../Utility/GL/gl-matrix.js";
-import M_Shader from "../Utility/Shader/M_shader.js";
-import {gl, camera, projection_matrix} from "../game.js";
 import MeshLoader from "../Assets/mesh_loader.js";
+import { vec3 } from "../Utility/GL/gl-matrix.js";
+import M_Mesh from "./M_Mesh.js";
+import M_Shader from "../Utility/Shader/M_shader.js";
 
-export default class RectangularPrism extends M_Mesh {
+export default class DeerMesh extends M_Mesh {
 
     vertices(): Float32Array {
         return new Float32Array(
-            MeshLoader.loaded_meshes[ "cube" ][ "meshes" ][ 0 ][ "vertices" ]
+            MeshLoader.loaded_meshes[ "deer" ][ "meshes" ][ 0 ][ "vertices" ]
         );
     }
 
     faces(): Uint16Array {
         return new Uint16Array(
-            MeshLoader.flatten( MeshLoader.loaded_meshes[ "cube" ][ "meshes" ][ 0 ][ "faces" ] )
+            MeshLoader.flatten( MeshLoader.loaded_meshes[ "deer" ][ "meshes" ][ 0 ][ "faces" ] )
         );
     }
 
     normals(): Float32Array {
         return new Float32Array(
-            MeshLoader.loaded_meshes[ "cube" ][ "meshes" ][ 0 ][ "normals" ]
+            MeshLoader.loaded_meshes[ "deer" ][ "meshes" ][ 0 ][ "normals" ]
         );
     };
 

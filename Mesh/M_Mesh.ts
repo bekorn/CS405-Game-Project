@@ -65,7 +65,7 @@ export default abstract class M_Mesh {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
     }
 
-    draw( parent_model : mat4 ) {
+    async draw( parent_model : mat4 ) {
         // console.log( "Drawing SHAPE:"+ this.id );
 
         let model = mat4.clone( parent_model );
