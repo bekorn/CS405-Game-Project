@@ -1,7 +1,7 @@
-import M_Object from "./M_Object.js";
-import { vec3 } from "../Utility/GL/gl-matrix.js";
-import RectangularPrism from "../Mesh/cube.js";
-import M_Shader from "../Shader/M_shader.js";
+import M_Object from "../../Engine/Object/M_Object.js";
+import { vec3 } from "../../Engine/Utility/GL/gl-matrix.js";
+import RectangularPrism from "../Meshes/cube.js";
+import M_Shader from "../../Engine/Shader/M_shader.js";
 
 export default class Axes extends M_Object {
 

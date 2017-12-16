@@ -1,7 +1,7 @@
-import M_Mesh from "./M_Mesh.js";
-import {vec3} from "../Utility/GL/gl-matrix.js";
-import M_Shader from "../Shader/M_shader.js";
-import MeshLoader from "../Utility/mesh_loader.js";
+import M_Mesh from "../../Engine/Mesh/M_Mesh.js";
+import {vec3} from "../../Engine/Utility/GL/gl-matrix.js";
+import M_Shader from "../../Engine/Shader/M_shader.js";
+import MeshLoader from "../../Engine/Utility/mesh_loader.js";
 
 export default class Cube extends M_Mesh {
 
