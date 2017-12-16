@@ -1,10 +1,11 @@
 import M_Mesh from "./M_Mesh.js";
-import {glMatrix, vec3, mat4} from "../Utility/GL/gl-matrix.js";
-import M_Shader from "../Utility/Shader/M_shader.js";
-import {gl, camera, projection_matrix} from "../game.js";
-import MeshLoader from "../Assets/mesh_loader.js";
+import {vec3} from "../Utility/GL/gl-matrix.js";
+import M_Shader from "../Shader/M_shader.js";
+import MeshLoader from "../Utility/mesh_loader.js";
 
-export default class RectangularPrism extends M_Mesh {
+export default class Cube extends M_Mesh {
+
+    colour = vec3.fromValues( Math.random(), Math.random(), Math.random() );
 
     vertices(): Float32Array {
         return new Float32Array(

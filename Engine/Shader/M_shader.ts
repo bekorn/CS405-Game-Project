@@ -1,4 +1,4 @@
-import {gl} from "../../game.js";
+import {gl} from "../engine.js";
 
 export default abstract class M_Shader {
 

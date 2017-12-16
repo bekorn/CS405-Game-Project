@@ -1,6 +1,6 @@
-import M_Object from "../M_Object.js";
-import {vec3, mat4} from "../../Utility/GL/gl-matrix.js";
-import {Controller} from "../../Utility/Controller.js";
+import M_Object from "../Object/M_Object.js";
+import {vec3, mat4} from "../Utility/GL/gl-matrix.js";
+import {Controller} from "../Utility/controller.js";
 
 export default class Camera extends M_Object {
 

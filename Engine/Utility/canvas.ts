@@ -1,6 +1,5 @@
 import {WebGLUtils} from "./GL/webgl-utils.js";
-import {gl} from "../game.js";
-import {vec3} from ".//GL/gl-matrix.js";
+import {gl} from "../engine.js";
 
 export default  class Canvas {
 
@@ -23,9 +22,8 @@ export default  class Canvas {
     }
 
     getGL() : WebGLRenderingContext {
-        let tempgl = WebGLUtils.setupWebGL(this.dom);
-        console.log( tempgl );
-        return tempgl;
+
+        return WebGLUtils.setupWebGL(this.dom);
     }
 
     refresh() {

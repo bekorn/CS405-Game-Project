@@ -1,14 +1,12 @@
 import M_Object from "./M_Object.js";
-import {glMatrix, mat4, vec3, quat} from "../Utility/GL/gl-matrix.js";
-import RectangularPrism from "../Mesh/rectangular_prism.js";
-import M_Shader from "../Utility/Shader/M_shader.js";
+import { vec3 } from "../Utility/GL/gl-matrix.js";
+import RectangularPrism from "../Mesh/cube.js";
+import M_Shader from "../Shader/M_shader.js";
 
 export default class Axes extends M_Object {
 
     constructor( shader: M_Shader, parent : M_Object ) {
-        super( shader );
-
-        parent.add_child( this );
+        super( shader, parent );
 
         this.add_mesh( new RectangularPrism( this.shader, vec3.fromValues(100, 100, 100) ) );
         this.add_mesh( new RectangularPrism( this.shader, vec3.fromValues(350, 50, 50) ) );

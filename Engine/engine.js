@@ -7,14 +7,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import Canvas from "./Utility/canvas.js";
-import { requestAnimFrame } from "./Utility/GL/webgl-utils.js";
-import Scene from "./Object/Singleton/Scene.js";
-import Camera from "./Object/Singleton/Camera.js";
 import { glMatrix, mat4, vec3 } from "./Utility/GL/gl-matrix.js";
+import { requestAnimFrame } from "./Utility/GL/webgl-utils.js";
+import MeshLoader from "./Utility/mesh_loader.js";
+import { Controller } from "./Utility/controller.js";
 import Axes from "./Object/Axes.js";
-import { Controller } from "./Utility/Controller.js";
-import ComplexShader from "./Utility/Shader/complex_shader.js";
-import MeshLoader from "./Assets/mesh_loader.js";
+import ComplexShader from "./Shader/complex_shader.js";
+import Scene from "./Essentials/scene.js";
+import Camera from "./Essentials/camera.js";
+import Light from "./Essentials/light.js";
+///////////////////////////////////////////////////////////////
 export let gl;
 export let canvas;
 export let scene;
@@ -22,8 +24,14 @@ export let camera;
 export let projection_matrix;
 export let light;
 export let objects = [];
-window.addEventListener('load', () => MeshLoader.load_all().then(setup_game).then(game_loop));
-function setup_game() {
+export function setup() {
+    return __awaiter(this, void 0, void 0, function* () {
+        MeshLoader.load_all()
+            .then(initialize_basics)
+            .then(game_loop);
+    });
+}
+function initialize_basics() {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("Game Setup Started");
         canvas = new Canvas('gl-canvas', 512, 512, 512);
@@ -47,10 +55,11 @@ function setup_game() {
         const eye = vec3.fromValues(0, 0, 300);
         const target = vec3.fromValues(0, 100, 0);
         camera = new Camera(eye, target);
+        camera.model.translate_global(eye);
         attach_to_loop(camera);
-        scene.add_child(camera, eye);
         //  Initialize light
-        light = vec3.fromValues(600, 600, -600);
+        light = new Light(null);
+        light.model.translate_global(vec3.fromValues(600, 600, -600));
         console.log("Setup Completed");
         //////////////////////////////////
         //////        GAME          //////
@@ -99,4 +108,4 @@ function game_loop() {
     gl.clearDepth(1.0);
     scene.draw().then(() => requestAnimFrame(game_loop, canvas));
 }
-//# sourceMappingURL=game.js.map
+//# sourceMappingURL=engine.js.map

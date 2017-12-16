@@ -1,5 +1,5 @@
 import M_Shader from "./M_shader.js";
-import { gl } from "../../game";
+import { gl } from "../engine";
 
 export default class SimpleShader extends M_Shader {
 

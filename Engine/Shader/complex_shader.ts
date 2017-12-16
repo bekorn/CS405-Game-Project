@@ -24,7 +24,6 @@ export default class ComplexShader extends M_Shader {
                 
                 gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix  * vec4( aVertexPosition, 1.0 );
                 
-                
                 worldPos = uModelMatrix * vec4( aVertexPosition, 1.0 );
                 worldPos /= worldPos.w;
                 
@@ -43,13 +42,15 @@ export default class ComplexShader extends M_Shader {
             uniform vec3 uLightPos;
             uniform vec3 uCameraPos;
             
+            uniform vec3 uMaterialColour;
+            uniform float uSpecularFactor;
+            
             varying vec3 originalPos;
             varying vec4 worldPos;
             varying vec3 normal;
             
             void main() {
-                
-                vec3 material_colour = vec3( 0.423529412, 0.956862745, 0.274509804 );
+            
                 vec3 light_colour = vec3( 1.0 );
                 vec3 result = vec3( 0.0 );
                 
@@ -68,16 +69,15 @@ export default class ComplexShader extends M_Shader {
                     //  Diffuse Lighting
                     diffuse = dotNL;
                     
-                    
                     //  Specular Lighting
                     vec3 toEye = normalize( worldPos.xyz - uCameraPos );
                     vec3 reflect = reflect( lightDir, normal );
                     
                     specular = clamp( dot( toEye, reflect ), 0.0, 1.0 );
-                    specular = pow( specular, 512.0 );
+                    specular = pow( specular, uSpecularFactor );
                 }
                 
-                result = (material_colour * (ambient + diffuse)) + (specular);
+                result = (uMaterialColour * (ambient + diffuse)) + (specular);
                 
                 gl_FragColor = vec4( result, 1.0 );
             }
@@ -93,7 +93,10 @@ export default class ComplexShader extends M_Shader {
         projection_matrix : 'uProjectionMatrix',
 
         light_position : 'uLightPos',
-        camera_position : 'uCameraPos'
+        camera_position : 'uCameraPos',
+
+        colour : 'uMaterialColour',
+        specular : 'uSpecularFactor'
     };
 
     constructor() {

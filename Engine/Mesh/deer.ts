@@ -1,9 +1,12 @@
-import MeshLoader from "../Assets/mesh_loader.js";
+import MeshLoader from "../Utility/mesh_loader.js";
 import { vec3 } from "../Utility/GL/gl-matrix.js";
 import M_Mesh from "./M_Mesh.js";
-import M_Shader from "../Utility/Shader/M_shader.js";
+import M_Shader from "../Shader/M_shader.js";
 
 export default class DeerMesh extends M_Mesh {
+
+    colour = vec3.fromValues( 0.423529412, 0.956862745, 0.274509804 );
+    specular = 128;
 
     vertices(): Float32Array {
         return new Float32Array(

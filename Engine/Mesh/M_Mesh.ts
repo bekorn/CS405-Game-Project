@@ -1,8 +1,8 @@
 import {vec3, mat4} from "../Utility/GL/gl-matrix.js";
-import M_Shader from "../Utility/Shader/M_shader.js";
+import M_Shader from "../Shader/M_shader.js";
 import Model from "../Utility/model.js";
 import M_Object from "../Object/M_Object.js";
-import { camera, gl, light, projection_matrix } from "../game.js";
+import { camera, gl, light, projection_matrix } from "../engine.js";
 
 export default abstract class M_Mesh {
 
@@ -19,6 +19,11 @@ export default abstract class M_Mesh {
     face_size : number;
     normal_buffer : WebGLBuffer;
     normal_size : number;
+
+    //  Material Properties     //
+    colour : vec3 = vec3.fromValues( 0.5, 0.5, 0.5 );
+    specular : number = 256;
+    //////////////////////////////
 
     abstract vertices() : Float32Array;
     abstract faces() : Uint16Array;
@@ -79,8 +84,11 @@ export default abstract class M_Mesh {
         gl.uniformMatrix4fv( this.shader.bindings.view_matrix, false, new Float32Array( camera.view_matrix ) );
         gl.uniformMatrix4fv( this.shader.bindings.projection_matrix, false, new Float32Array( projection_matrix ) );
 
-        gl.uniform3fv( this.shader.bindings.light_position, new Float32Array( light ) );
+        gl.uniform3fv( this.shader.bindings.light_position, new Float32Array( light.model.global_position() ) );
         gl.uniform3fv( this.shader.bindings.camera_position, new Float32Array( camera.model.global_position() ) );
+
+        gl.uniform3fv( this.shader.bindings.colour, this.colour );
+        gl.uniform1f( this.shader.bindings.specular, this.specular );
 
         //  Bind Vertices
         gl.bindBuffer( gl.ARRAY_BUFFER, this.vertex_buffer );

@@ -1,11 +1,10 @@
-import M_Shape from "../Mesh/M_Mesh.js";
-import {glMatrix, vec3, mat4} from "../Utility/GL/gl-matrix.js";
-import M_Shader from "../Utility/Shader/M_shader.js";
+import {vec3, mat4} from "../Utility/GL/gl-matrix.js";
+import M_Shader from "../Shader/M_shader.js";
 import M_Mesh from "../Mesh/M_Mesh.js";
 import M_Texture from "../Texture/M_Texture.js";
 import M_Material from "../Material/M_Material.js";
 import Model from "../Utility/model.js";
-import { scene } from "../game.js";
+import { scene } from "../engine.js";
 
 export default abstract class M_Object {
 
@@ -19,11 +18,17 @@ export default abstract class M_Object {
     model : Model = new Model( this );
 
     meshes : M_Mesh[] = [];
-    textrures : M_Texture[] = [];
+    textures : M_Texture[] = [];
     materials : M_Material[] = [];
 
     constructor( shader: M_Shader, parent : M_Object = scene ) {
+
         this.shader = shader;
+
+        if( parent != null ) {
+
+            parent.add_child( this );
+        }
     }
 
     add_child( obj: M_Object, relative_dist: vec3 = vec3.create() ) : void {
