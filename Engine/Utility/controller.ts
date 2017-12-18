@@ -1,48 +1,39 @@
 export class Controller {
 
-    static key_map : { key_code : Number, is_down : Boolean };
+    static key_map : { [key_code : number] : string } = {
+        37: 'left',
+        38 : 'up',
+        39 : 'right',
+        40 : 'down',
+        76 : 'depth_debug', //  L
+
+        87 : 'w',
+        65 : 'a',
+        83 : 's',
+        68 : 'd'
+    };
     static left : Boolean = false;
     static up : Boolean = false;
     static right : Boolean = false;
     static down : Boolean = false;
+    static depth_debug : Boolean = false;
+    static w : Boolean = false;
+    static a : Boolean = false;
+    static s : Boolean = false;
+    static d : Boolean = false;
 
 
     static init_controller() {
         window.addEventListener( 'keydown', ( event ) => {
 
-            if( event.keyCode == 37 ) {
-                Controller.left = true
-            }
-
-            if( event.keyCode == 38 ) {
-                Controller.up = true
-            }
-
-            if( event.keyCode == 39 ) {
-                Controller.right = true
-            }
-            if( event.keyCode == 40 ) {
-                Controller.down = true
-            }
+            const key_name = Controller.key_map[ event.keyCode ];
+            Controller[ key_name ] = true;
         } );
 
         window.addEventListener( 'keyup', ( event ) => {
 
-            if( event.keyCode == 37 ) {
-                Controller.left = false
-            }
-
-            if( event.keyCode == 38 ) {
-                Controller.up = false
-            }
-
-            if( event.keyCode == 39 ) {
-                Controller.right = false
-            }
-
-            if( event.keyCode == 40 ) {
-                Controller.down = false
-            }
+            const key_name = Controller.key_map[ event.keyCode ];
+            Controller[ key_name ] = false;
         } );
     }
 }
