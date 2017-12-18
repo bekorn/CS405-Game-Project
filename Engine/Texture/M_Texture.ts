@@ -1,3 +1,10 @@
-export default class M_Texture {
-    
+
+
+export default abstract class M_Texture {
+
+    abstract texture : WebGLTexture;
+
+    constructor() {
+
+    }
 }
