@@ -1,4 +1,4 @@
-import MeshLoader from "../../Engine/Utility/mesh_loader.js";
+import MeshLoader from "../../Engine/Mesh/mesh_loader.js";
 import { vec3 } from "../../Engine/Utility/GL/gl-matrix.js";
 import M_Mesh from "../../Engine/Mesh/M_Mesh.js";
 import M_Shader from "../../Engine/Shader/M_shader.js";
@@ -25,6 +25,12 @@ export default class DeerMesh extends M_Mesh {
             MeshLoader.loaded_meshes[ "deer" ][ "meshes" ][ 0 ][ "normals" ]
         );
     };
+
+    uvmap() : Float32Array {
+        return new Float32Array(
+            MeshLoader.loaded_meshes[ "deer" ][ "meshes" ][ 0 ][ "texturecoords" ][ 0 ]
+        );
+    }
 
     constructor( shader : M_Shader, dimensions : vec3 ) {
 

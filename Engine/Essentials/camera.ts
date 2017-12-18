@@ -4,13 +4,16 @@ import {Controller} from "../Utility/controller.js";
 
 export default class Camera extends M_Object {
 
+    projection_matrix : mat4;
     view_matrix : mat4 = mat4.create();
     following : M_Object = null;
     target : vec3;
     dist : vec3 = vec3.fromValues( 400, 400, 500 );
 
-    constructor( eye : vec3, target: vec3) {
+    constructor( eye : vec3, target: vec3, projection_matrix : mat4 ) {
         super( null );
+
+        this.projection_matrix = projection_matrix;
 
         this.target = target;
         mat4.lookAt( this.view_matrix, eye, target, vec3.fromValues(0,1,0) );
@@ -31,7 +34,9 @@ export default class Camera extends M_Object {
         // const pos = this.model.global_position();
         // mat4.lookAt( this.view_matrix, pos, vec3.add( vec3.fromValues(0,0,0), this.target, vec3.fromValues(0,pos[1]-200,0) ), vec3.fromValues(0,1,0) );
 
-        mat4.lookAt( this.view_matrix, this.model.global_position(), this.target, vec3.fromValues(0,1,0) );
+        // const corrected_up = vec3.transformQuat( vec3.fromValues(0,0,0), vec3.fromValues(0,1,0), this.model.rotation );
+        const corrected_up = vec3.fromValues(0,1,0);
+        mat4.lookAt( this.view_matrix, this.model.global_position(), this.target, corrected_up );
 
         // const self_pos = vec3.add( vec3.fromValues(0,0,0), this.target, this.dist );
         // mat4.lookAt( this.view_matrix, self_pos, this.target, vec3.fromValues(0,1,0) );
@@ -43,9 +48,11 @@ export default class Camera extends M_Object {
             this.model.rotate_globalY( 1 );
         }
         if (Controller.up == true) {
+            // this.model.rotate_globalX( -1 );
             this.model.translate(vec3.fromValues(0, 6, 0));
         }
         if (Controller.down == true) {
+            // this.model.rotate_globalX( 1 );
             this.model.translate(vec3.fromValues(0, -6, 0));
         }
     }

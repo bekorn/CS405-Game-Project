@@ -11,14 +11,14 @@ export default class Scene extends M_Object {
 
         this.model.parent_model = new RootModel();
 
-        // this.add_mesh( new Cube( shader, vec3.fromValues(1600, 10, 1600) ), vec3.fromValues( 0, -100, 0 ) );
+        // this.add_mesh( new CubeMesh( shader, vec3.fromValues(1600, 10, 1600) ), vec3.fromValues( 0, -100, 0 ) );
     }
 
     update() {
 
-        for( const mesh of this.meshes ) {
-            mesh.model.rotateY( 1 );
-        }
+        // for( const mesh of this.meshes ) {
+        //     mesh.model.rotateY( 1 );
+        // }
     }
 
     async draw() {

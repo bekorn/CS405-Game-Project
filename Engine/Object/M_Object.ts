@@ -31,7 +31,7 @@ export default abstract class M_Object {
         }
     }
 
-    add_child( obj: M_Object, relative_dist: vec3 = vec3.create() ) : void {
+    add_child( obj: M_Object, relative_dist: vec3 = vec3.create() ) : M_Object {
 
         obj.parent = this;
 
@@ -42,9 +42,11 @@ export default abstract class M_Object {
         obj.model.translate_global( relative_dist );
 
         this.children.push( obj );
+
+        return obj;
     }
 
-    add_mesh( mesh : M_Mesh, relative_dist: vec3 = vec3.create() ) : void {
+    add_mesh( mesh : M_Mesh, relative_dist: vec3 = vec3.create() ) : M_Mesh {
 
         mesh.parent = this;
 
@@ -55,6 +57,8 @@ export default abstract class M_Object {
         mesh.model.translate_global( relative_dist );
 
         this.meshes.push( mesh );
+
+        return mesh;
     }
 
     move() : void {

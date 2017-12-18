@@ -1,7 +1,8 @@
 import {WebGLUtils} from "./GL/webgl-utils.js";
 import {gl} from "../engine.js";
+import DepthBuffer from "./shadow_map.js";
 
-export default  class Canvas {
+export default class Canvas {
 
     readonly dom : HTMLCanvasElement;
     readonly width : number;
@@ -31,15 +32,16 @@ export default  class Canvas {
         let window_height = document.documentElement.clientHeight;
 
         if( (window_width / this.width) < (window_height / this.height) ) {
-            this.dom.width = window_width;
-            this.dom.height = this.height * window_width / this.width;
+            this.dom.width = Math.round( window_width );
+            this.dom.height = Math.round( this.height * window_width / this.width );
         }
         else {
-            this.dom.height = window_height;
-            this.dom.width = this.width * window_height / this.height;
+            this.dom.height = Math.round( window_height );
+            this.dom.width = Math.round( this.width * window_height / this.height );
         }
 
         gl.viewport( 0, 0, this.dom.width, this.dom.height );
+        DepthBuffer.viewport( Math.ceil( this.dom.clientWidth ), Math.ceil( this.dom.clientHeight ) );
 
         // console.log( "Resized to "+ this.dom.width +"x"+ this.dom.height +" (Window: "+ window_width +"x"+ window_height +")" );
     }
