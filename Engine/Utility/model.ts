@@ -1,4 +1,6 @@
 import {glMatrix, vec3, mat4, quat} from "./GL/gl-matrix.js";
+import M_Object from "../Object/M_Object.js";
+import M_Mesh from "../Mesh/M_Mesh.js";
 
 /*
     Multiplying from left is local,
@@ -7,7 +9,7 @@ import {glMatrix, vec3, mat4, quat} from "./GL/gl-matrix.js";
 
 export default class Model {
 
-    belongs_to : any;
+    belongs_to : M_Object | M_Mesh | null;
     parent_model : Model;
     updated : boolean = true;
     model : mat4;
@@ -20,9 +22,13 @@ export default class Model {
     //  Global (relative to parent)
     global_rotation : quat = quat.fromEuler( quat.create(),0,0,0);
 
-    constructor( obj : any ) {
-        this.belongs_to = obj;
-        this.parent_model = obj.model;
+    constructor( obj : M_Object | M_Mesh | null ) {
+
+        if( obj != null ) {
+
+            this.belongs_to = obj;
+            this.parent_model = obj.model;
+        }
     }
 
     get_model() : mat4 {
@@ -32,14 +38,25 @@ export default class Model {
             return this.model;
         }
 
+
+        //  Result model is: Scale * GlobalRot * Transition * Rotation * Identity
+
         let model = mat4.create();
+
         mat4.fromRotationTranslationScale( model, this.rotation, this.translation, vec3.fromValues(1,1,1) );
 
         //  Translate around parent
         mat4.translate( model, model, vec3.negate( vec3.create(), this.translation ) );
-        mat4.multiply( model, model, mat4.fromQuat(mat4.create(), this.global_rotation) );
+        mat4.multiply( model, model, mat4.fromQuat(mat4.create(), this.global_rotation ) );
         mat4.scale( model, model, this.scale );
         mat4.translate( model, model, this.translation );
+
+/*        mat4.multiply( model, mat4.fromQuat(mat4.create(), this.rotation), model );
+
+        //  Translate around parent
+        mat4.translate( model, model, this.translation );
+        // mat4.multiply( model, mat4.fromQuat(mat4.create(), this.global_rotation), model );
+        mat4.scale( model, model, this.scale );*/
 
         this.model = model;
         this.updated = false;
@@ -66,7 +83,11 @@ export default class Model {
 
     translate( v3 : vec3 ) {
 
-        vec3.add( this.translation, this.translation, v3 );
+        const relative_dist = vec3.fromValues( 0, 0,0 );
+
+        vec3.transformMat4( relative_dist, v3, mat4.fromQuat(mat4.create(), this.rotation) );
+
+        vec3.add( this.translation, this.translation, relative_dist );
 
         this.updated = true;
     }

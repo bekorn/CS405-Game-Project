@@ -10,7 +10,12 @@ export class Controller {
         87 : 'w',
         65 : 'a',
         83 : 's',
-        68 : 'd'
+        68 : 'd',
+
+        81 : 'q',
+        69 : 'e',
+
+        32 : 'space',
     };
     static left : Boolean = false;
     static up : Boolean = false;
@@ -21,7 +26,9 @@ export class Controller {
     static a : Boolean = false;
     static s : Boolean = false;
     static d : Boolean = false;
-
+    static q : Boolean = false;
+    static e : Boolean = false;
+    static space : Boolean = false;
 
     static init_controller() {
         window.addEventListener( 'keydown', ( event ) => {

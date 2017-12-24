@@ -1,28 +1,18 @@
 import M_Object from "../../Engine/Object/M_Object.js";
 import CubeMesh from "../Meshes/cube.js";
 import { vec3 } from '../../Engine/Utility/GL/gl-matrix.js';
+import { scene } from "../../Engine/engine.js";
 
 export default class Cube extends M_Object {
 
     private speed : number;
 
-    constructor( shader, scale, dist, speed ) {
+    constructor( dimension : vec3, parent : M_Object = scene ) {
 
-        super( shader );
+        super( parent );
 
-        this.model.translate_global( vec3.fromValues( 0, 0, dist ) );
-        this.model.rotate_globalY( Math.random() * 360 );
-        this.model.rotate_globalX( Math.random() * 40 - 20 );
-
-        this.speed = speed;
-
-        this.add_mesh( new CubeMesh( shader, vec3.fromValues( scale, scale, scale ) ) );
+        this.add_mesh( new CubeMesh( dimension ) );
     }
 
-    update() {
 
-        this.model.rotate_globalY( this.speed );
-
-        this.meshes[0].model.rotateX( this.speed * Math.random() );
-    }
 }

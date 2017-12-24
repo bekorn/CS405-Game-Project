@@ -6,8 +6,8 @@ import DeerMesh from "../../Game/Meshes/deer.js";
 
 export default class Scene extends M_Object {
 
-    constructor( shader: M_Shader ) {
-        super( shader, null );
+    constructor() {
+        super( null );
 
         this.model.parent_model = new RootModel();
 
@@ -21,10 +21,10 @@ export default class Scene extends M_Object {
         // }
     }
 
-    async draw() {
-        //  Initializes draw tree with its own model
+    async refresh_model() {
+        //  Initializes refresh_model tree with its own model
         const model = mat4.clone( this.model.get_model() );
 
-        return super.draw( model );
+        return super.refresh_model( model );
     }
 }

@@ -4,7 +4,7 @@ import { vec3 } from "./GL/gl-matrix.js";
 export default class RootModel extends Model {
 
     constructor() {
-        super( {model: null} );
+        super( null );
 
         this.scale = vec3.fromValues(1,1,1);
     }

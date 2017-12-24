@@ -4,15 +4,19 @@ export default class TextureLoader {
 
     static loaded_textures : { [key: string] : WebGLTexture } = {};
 
-    static to_load : string[] = [
-        'mlg_frog',
-        'creeper',
-        'kreygasm',
-        'simple',
-        'krabs',
+    static to_load : string[][] = [
+        [ 'mlg_frog', 'jpg' ],
+        [ 'creeper', 'jpg' ],
+        [ 'kreygasm', 'jpg' ],
+        [ 'simple', 'jpg' ],
+        [ 'krabs', 'jpg' ],
+        [ 'heart', 'png' ],
     ];
 
-    static async load( file_name : string ) : Promise<any> {
+    static extension : EXT_texture_filter_anisotropic;
+    static max_anisotropic;
+
+    static async load( file : string[] ) : Promise<any> {
 
         //  Promise will resolve when the image is loaded
         return new Promise( (resolve) => {
@@ -22,7 +26,7 @@ export default class TextureLoader {
 
                 //  Create texture
                 const texture = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.bindTexture( gl.TEXTURE_2D, texture );
 
                 //  Bind Loaded image
                 gl.texImage2D( gl.TEXTURE_2D,
@@ -30,40 +34,32 @@ export default class TextureLoader {
                     gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE,
                     image );
 
-                // WebGL1 has different requirements for power of 2 images
-                // vs non power of 2 images so check if the image is a
-                // power of 2 in both dimensions.
-                if (TextureLoader.isPowerOf2(image.width)  &&  TextureLoader.isPowerOf2(image.height)) {
-                    // Yes, it's a power of 2. Generate mips.
-                    gl.generateMipmap(gl.TEXTURE_2D);
-                } else {
-                    // No, it's not a power of 2. Turn of mips and set
-                    // wrapping to clamp to edge
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
+                gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
+                gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR );
+                gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR );
+                gl.texParameterf( gl.TEXTURE_2D, TextureLoader.extension.TEXTURE_MAX_ANISOTROPY_EXT, TextureLoader.max_anisotropic );
+                gl.generateMipmap( gl.TEXTURE_2D );
 
-                    //  Makes the texture repeat (like uvmap mod 1)
-                    //  https://webglfundamentals.org/webgl/lessons/webgl-3d-textures.html
-                    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-                    // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+                gl.bindTexture( gl.TEXTURE_2D, null );
 
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                }
-
-                TextureLoader.loaded_textures[ file_name ] = texture;
+                TextureLoader.loaded_textures[ file[0] ] = texture;
 
                 const loaded = Object.keys( TextureLoader.loaded_textures ).length;
                 const all = TextureLoader.to_load.length;
-                console.log( '[' + loaded.toString() + '/' + all.toString() + '] Loaded : ' + file_name );
+                console.log( '[' + loaded + '/' + all + '] Loaded : ' + file[0] + '.' + file[1] );
 
                 resolve();
             };
 
-            image.src = 'Assets/Textures/' + file_name + '.jpg';
+            image.src = 'Assets/Textures/' + file[0] + '.' + file[1];
         } );
     }
 
     static async load_all() : Promise<any> {
+
+        TextureLoader.extension = gl.getExtension('EXT_texture_filter_anisotropic');
+        TextureLoader.max_anisotropic = gl.getParameter( TextureLoader.extension.MAX_TEXTURE_MAX_ANISOTROPY_EXT );
 
         console.log( "Started Loading Textures" );
         return Promise.all( TextureLoader.to_load.map( (file) => TextureLoader.load( file ) ) );

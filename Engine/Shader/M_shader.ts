@@ -1,4 +1,7 @@
 import {gl} from "../engine.js";
+import M_Object from "../Object/M_Object";
+import M_Mesh from "../Mesh/M_Mesh";
+import { VAO } from "../Mesh/mesh_loader";
 
 export default abstract class M_Shader {
 
@@ -10,11 +13,11 @@ export default abstract class M_Shader {
 
     program : WebGLProgram;
 
-    constructor() {
+    protected constructor() {
         this.program = M_Shader.init_shaders( this.vertex_shader(), this.fragment_shader() );
     }
 
-    // Initialize a shader program, so WebGL knows how to draw our data
+    // Initialize a shader program, so WebGL knows how to refresh_model our data
     private static init_shaders( vsSource, fsSource) {
 
         const vertexShader = M_Shader.load_shader(gl.VERTEX_SHADER, vsSource);
@@ -55,6 +58,7 @@ export default abstract class M_Shader {
         return shader;
     }
 
+    //  Does the bindings listed in binding_map
     protected bind_program() {
 
         for( let key in this.binding_map ) {
@@ -71,4 +75,17 @@ export default abstract class M_Shader {
             }
         }
     }
+
+
+    //  Renders the shader
+    public abstract render();
+
+    //  Binds variables that are same for all the meshes
+    protected abstract frame_bindings();
+
+    //  Binds variables that are same for a class
+    protected abstract class_bindings( vao : VAO, instances : M_Mesh[]  );
+
+    //  Binds variables that are same for a mesh (singleton)
+    protected abstract instance_bindings( instance : M_Mesh );
 }

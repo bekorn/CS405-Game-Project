@@ -11,7 +11,7 @@ export default class Camera extends M_Object {
     dist : vec3 = vec3.fromValues( 400, 400, 500 );
 
     constructor( eye : vec3, target: vec3, projection_matrix : mat4 ) {
-        super( null );
+        super();
 
         this.projection_matrix = projection_matrix;
 
@@ -41,19 +41,13 @@ export default class Camera extends M_Object {
         // const self_pos = vec3.add( vec3.fromValues(0,0,0), this.target, this.dist );
         // mat4.lookAt( this.view_matrix, self_pos, this.target, vec3.fromValues(0,1,0) );
 
-        if (Controller.left == true) {
-            this.model.rotate_globalY( -1 );
-        }
-        if (Controller.right == true) {
-            this.model.rotate_globalY( 1 );
-        }
-        if (Controller.up == true) {
-            // this.model.rotate_globalX( -1 );
-            this.model.translate(vec3.fromValues(0, 6, 0));
-        }
-        if (Controller.down == true) {
+        if (Controller.e == true) {
             // this.model.rotate_globalX( 1 );
-            this.model.translate(vec3.fromValues(0, -6, 0));
+            this.model.translate(vec3.fromValues(0, 0, -4));
+        }
+        if (Controller.q == true) {
+            // this.model.rotate_globalX( 1 );
+            this.model.translate(vec3.fromValues(0, 0, 4));
         }
     }
 }

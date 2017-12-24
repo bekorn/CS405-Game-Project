@@ -1,6 +1,7 @@
 import M_Object from "../Object/M_Object.js";
 import { mat4, vec3 } from "../Utility/GL/gl-matrix.js";
 import { Controller } from "../Utility/controller.js";
+import ShadowMap from "../Utility/shadow_map";
 
 export default class Light extends M_Object {
 
@@ -14,17 +15,17 @@ export default class Light extends M_Object {
     //  Always points at origin
     target : vec3 = vec3.fromValues(0,0,0);
     
-    constructor( v3 : vec3, projection_matrix : mat4 ) {
-        super( null );
+    constructor( v3 : vec3, texture_width : number, texture_height : number  ) {
+        super();
 
         this.model.translate_global( v3 );
 
-        this.projection_matrix = projection_matrix;
-
-        this.calc_view_matrix();
+        this.refresh_matrices( texture_width , texture_height );
     }
 
-    calc_view_matrix() {
+    refresh_matrices( texture_width : number, texture_height : number ) {
+
+        mat4.ortho( this.projection_matrix, -texture_width / 2, texture_width / 2, -texture_height / 2, texture_height / 2, 0, 500 );
 
         mat4.lookAt( this.view_matrix, this.model.global_position(), this.target, vec3.fromValues(0,1,0) );
 

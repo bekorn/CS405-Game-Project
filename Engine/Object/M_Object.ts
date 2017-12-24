@@ -14,16 +14,13 @@ export default abstract class M_Object {
     parent : M_Object = null;
     children: M_Object[] = [];
 
-    shader : M_Shader;
     model : Model = new Model( this );
 
     meshes : M_Mesh[] = [];
     textures : M_Texture[] = [];
     materials : M_Material[] = [];
 
-    constructor( shader: M_Shader, parent : M_Object = scene ) {
-
-        this.shader = shader;
+    constructor( parent : M_Object = scene ) {
 
         if( parent != null ) {
 
@@ -69,22 +66,22 @@ export default abstract class M_Object {
 
     }
 
-    update() : void {
+    update( delta_time : number ) : void {
 
     }
 
-    async draw( parent_model: mat4 ) : Promise<any> {
+    async refresh_model( parent_model: mat4 ) : Promise<any> {
 
         // console.log( "Drawing OBJECT:"+ this.id );
 
         let model = mat4.create();
         mat4.multiply( model, parent_model, this.model.get_model() );
 
-        //  Wait for all children to draw their meshes
-        await Promise.all( this.children.map( (child) => child.draw( model ) ) );
+        //  Wait for all children to refresh_model their meshes
+        await Promise.all( this.children.map( (child) => child.refresh_model( model ) ) );
 
         //  Draw your meshes asynchronously
-        return Promise.all( this.meshes.map( (mesh) => mesh.draw( model ) ) );
+        return Promise.all( this.meshes.map( (mesh) => mesh.refresh_model( model ) ) );
     }
 
 }

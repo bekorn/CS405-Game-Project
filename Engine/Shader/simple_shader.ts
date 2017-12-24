@@ -1,26 +1,28 @@
 import M_Shader from "./M_shader.js";
-import { gl } from "../engine";
+import { gl } from "../engine.js";
 
-export default class SimpleShader extends M_Shader {
+// This shader is obsolete
+/*
+export default class SimpleShader  extends M_Shader    {
 
     vertex_shader() {
         return `
             precision highp float;
-            
+
             attribute vec3 aVertexPosition;
-        
+
             uniform mat4 uModelViewMatrix;
             uniform mat4 uProjectionMatrix;
-            
+
             varying vec4 originalPosition;
             varying vec4 projectedPosition;
-            
+
             void main() {
-            
+
                 originalPosition = vec4(aVertexPosition,1.0);
-                
+
                 projectedPosition =  uProjectionMatrix * uModelViewMatrix * vec4(aVertexPosition,1);
-                
+
                 gl_Position = projectedPosition;
             }
         `;
@@ -29,15 +31,15 @@ export default class SimpleShader extends M_Shader {
     fragment_shader() {
         return `
             precision mediump float;
-            
+
             varying vec4 originalPosition;
             varying vec4 projectedPosition;
-            
+
             void main() {
                 vec3 light = vec3( 1.0, 1.0, 1.0 );
-                
+
                 vec3 colour = pow( (originalPosition.xyz), vec3( 3.0 ) );
-                
+
                 gl_FragColor = vec4( colour, 1.0 );
             }
         `;
@@ -57,3 +59,4 @@ export default class SimpleShader extends M_Shader {
         console.log( "SimpleShader created" );
     }
 }
+*/

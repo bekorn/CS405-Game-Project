@@ -1,6 +1,5 @@
-import {WebGLUtils} from "./GL/webgl-utils.js";
 import {gl} from "../engine.js";
-import DepthBuffer from "./shadow_map.js";
+import ShadowMap from "./shadow_map.js";
 
 export default class Canvas {
 
@@ -22,9 +21,14 @@ export default class Canvas {
         window.addEventListener( 'resize', this.refresh.bind( this ) );
     }
 
-    getGL() : WebGLRenderingContext {
+    getGL() : WebGL2RenderingContext {
 
-        return WebGLUtils.setupWebGL(this.dom);
+        return this.dom.getContext( 'webgl2', {
+            alpha : false,
+            depth : true,
+            stencil : false,
+            antialias : true
+        } );
     }
 
     refresh() {
@@ -40,8 +44,8 @@ export default class Canvas {
             this.dom.width = Math.round( this.width * window_height / this.height );
         }
 
-        gl.viewport( 0, 0, this.dom.width, this.dom.height );
-        DepthBuffer.viewport( Math.ceil( this.dom.clientWidth ), Math.ceil( this.dom.clientHeight ) );
+        // gl.viewport( 0, 0, this.dom.width, this.dom.height );
+        // ShadowMap.viewport( Math.ceil( this.dom.clientWidth ), Math.ceil( this.dom.clientHeight ) );
 
         // console.log( "Resized to "+ this.dom.width +"x"+ this.dom.height +" (Window: "+ window_width +"x"+ window_height +")" );
     }

@@ -8,35 +8,14 @@ export default class DeerMesh extends M_Mesh {
     colour = vec3.fromValues( 0.423529412, 0.956862745, 0.274509804 );
     specular = 128;
 
-    vertices(): Float32Array {
-        return new Float32Array(
-            MeshLoader.loaded_meshes[ "deer" ][ "meshes" ][ 0 ][ "vertices" ]
-        );
-    }
 
-    faces(): Uint16Array {
-        return new Uint16Array(
-            MeshLoader.flatten( MeshLoader.loaded_meshes[ "deer" ][ "meshes" ][ 0 ][ "faces" ] )
-        );
-    }
+    static vao = MeshLoader.loaded_meshes[ 'deer' ];
 
-    normals(): Float32Array {
-        return new Float32Array(
-            MeshLoader.loaded_meshes[ "deer" ][ "meshes" ][ 0 ][ "normals" ]
-        );
-    };
+    static instance_list : DeerMesh[] = [];
 
-    uvmap() : Float32Array {
-        return new Float32Array(
-            MeshLoader.loaded_meshes[ "deer" ][ "meshes" ][ 0 ][ "texturecoords" ][ 0 ]
-        );
-    }
+    constructor( dimensions : vec3 ) {
 
-    constructor( shader : M_Shader, dimensions : vec3 ) {
-
-        super( shader );
-
-        this.init_mesh();
+        super( DeerMesh );
 
         this.model.scale_v3_up( dimensions );
     }
