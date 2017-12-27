@@ -6,6 +6,10 @@ import M_Mesh from "../../Engine/Mesh/M_Mesh.js";
 
 export default class Hall extends M_Object {
 
+    width : number;
+    height : number;
+    length : number;
+
     floor : M_Mesh;
     ceiling : M_Mesh;
     left : M_Mesh;
@@ -14,20 +18,30 @@ export default class Hall extends M_Object {
     constructor(  width : number, height : number, length : number ) {
         super();
 
-        this.floor = this.add_mesh( new CubeMesh( vec3.fromValues( width * 3, height, length ) ) );
-        this.floor.texture = TextureLoader.loaded_textures[ 'simple' ];
-        this.floor.model.translate_global( vec3.fromValues( 0, -height * 2, 0 ) );
+        this.width = width;
+        this.height = height;
+        this.length = length;
 
-        this.ceiling = this.add_mesh( new CubeMesh( vec3.fromValues( width * 3, height, length ) ) );
-        this.ceiling.texture = TextureLoader.loaded_textures[ 'simple' ];
-        this.ceiling.model.translate_global( vec3.fromValues( 0, height * 2, 0 ) );
+        this.floor = this.add_wall( vec3.fromValues( width * 3, height, length ), vec3.fromValues( 0, -height * 2, 0 ) );
+        this.floor.texture = TextureLoader.loaded_textures[ 'Wooden Floor' ];
 
-        this.left = this.add_mesh( new CubeMesh( vec3.fromValues( width, height, length ) ) );
-        this.left.texture = TextureLoader.loaded_textures[ 'simple' ];
-        this.left.model.translate_global( vec3.fromValues( width * 2, 0, 0 ) );
+        this.ceiling = this.add_wall( vec3.fromValues( width * 3, height, length ), vec3.fromValues( 0, height * 2, 0 ) );
+        this.ceiling.texture = TextureLoader.loaded_textures[ 'Wooden Floor' ];
 
-        this.right = this.add_mesh( new CubeMesh( vec3.fromValues( width, height, length ) ) );
-        this.right.texture = TextureLoader.loaded_textures[ 'simple' ];
-        this.right.model.translate_global( vec3.fromValues( -width * 2, 0, 0 ) );
+        this.left = this.add_wall( vec3.fromValues( width, height, length ) , vec3.fromValues( width * 2, 0, 0 ) );
+        this.left.texture = TextureLoader.loaded_textures[ 'Brick Wall' ];
+
+        this.right = this.add_wall( vec3.fromValues( width, height, length ), vec3.fromValues( -width * 2, 0, 0 ) );
+        this.right.texture = TextureLoader.loaded_textures[ 'Brick Wall' ];
+    }
+
+    add_wall( dimensions : vec3, pos : vec3 ) : M_Mesh {
+
+        const wall = this.add_mesh( new CubeMesh( dimensions ) );
+        wall.model.translate_global( pos );
+
+        wall.attach_bbox( dimensions );
+
+        return wall;
     }
 }

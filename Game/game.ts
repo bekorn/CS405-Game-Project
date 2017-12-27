@@ -1,9 +1,8 @@
-import Engine, { attach_to_loop, scene } from "../Engine/engine.js";
-import { vec3 } from "../Engine/Utility/GL/gl-matrix.js";
-import Axes from "./Objects/Axes.js";
+import Engine, { attach_to_loop, camera, reset_time } from "../Engine/engine.js";
 import Lives from "./Objects/lives.js";
 import Player from "./Objects/player.js";
 import Hall from "./Objects/hall.js";
+import BoxSpawner from "./Objects/box_spawner.js";
 
 window.addEventListener('load', Engine.setup );
 
@@ -19,53 +18,45 @@ document.addEventListener("visibilitychange", () => {
     }
 });
 
-export default function game_setup() {
+export let gravity = 6.81;
+export let player : Player;
+export let hall : Hall;
+export let spawner : BoxSpawner;
+export let lives : Lives;
 
-    const player = new Player();
+export function game_setup() {
+
+    player = new Player();
     attach_to_loop( player );
 
-    const hall_width = 250;
-    const hall_height = 200;
-    const hall_length = 300;
+    camera.follow( player );
 
-    new Hall( 250, 200, 360 );
+    const hall_width = 8;
+    const hall_height = 6;
+    const hall_length = 40;
 
+    hall = new Hall( hall_width, hall_height, hall_length );
 
-    const lives = new Lives();
+    spawner = new BoxSpawner( 1400 );
+    attach_to_loop( spawner );
+
+    lives = new Lives();
     attach_to_loop( lives );
 }
 
+export function game_end() {
 
+    player.remove_self();
+    spawner.remove_self();
+    hall.remove_self();
+    lives.remove_self();
 
-///////////     TEST       ///////////////
-function axes_setup() {
+    camera.unfollow();
+}
 
-    //  Create main axes
-    const main_axes = new Axes( scene );
-    main_axes.model.scale_down( 5 );
-    // attach_to_loop( main_axes );
-    console.log( main_axes.model );
+export function game_restart() {
 
-
-    // Test Objects
-    const sat_1 = new Axes( scene );
-    sat_1.model.scale_down( 10 );
-    sat_1.model.translate_global( vec3.fromValues(0, 200, 0 ) );
-    attach_to_loop( sat_1 );
-    console.log( "sat_1", sat_1.model );
-    console.log( "sat_1", sat_1.model.global_position() );
-
-    const sat_2 = new Axes( sat_1 );
-    sat_2.model.scale_down( 2 );
-    sat_2.model.translate_global( vec3.fromValues( 0, 100, 0 ) );
-    attach_to_loop( sat_2 );
-    console.log( "sat_2", sat_2.model );
-    console.log( "sat_2", sat_2.model.global_position() );
-
-    const sat_3 = new Axes( sat_2 );
-    sat_3.model.scale_up( 0.5 );
-    sat_3.model.translate_global( vec3.fromValues( 0, 100, 0 ) );
-    attach_to_loop( sat_3 );
-    console.log( "sat_3", sat_3.model );
-    console.log( "sat_3", sat_3.model.global_position() );
+    game_end();
+    reset_time();
+    game_setup();
 }

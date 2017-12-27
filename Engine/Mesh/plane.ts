@@ -20,4 +20,12 @@ export default class Plane extends M_Mesh {
 
         Plane.instance_list.push( this );
     }
+
+    remove_self() {
+
+        super.remove_self();
+
+        let index = Plane.instance_list.indexOf( this );
+        Plane.instance_list.splice( index, 1 );
+    }
 }

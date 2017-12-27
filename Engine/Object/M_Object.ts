@@ -4,7 +4,7 @@ import M_Mesh from "../Mesh/M_Mesh.js";
 import M_Texture from "../Texture/M_Texture.js";
 import M_Material from "../Material/M_Material.js";
 import Model from "../Utility/model.js";
-import { scene } from "../engine.js";
+import { attach_to_loop, detach_from_loop, scene } from "../engine.js";
 
 export default abstract class M_Object {
 
@@ -30,26 +30,39 @@ export default abstract class M_Object {
 
     add_child( obj: M_Object, relative_dist: vec3 = vec3.create() ) : M_Object {
 
+        if( obj.parent != null ) {
+
+            obj.parent.remove_child( obj );
+        }
+
         obj.parent = this;
+
+        this.children.push( obj );
 
         obj.model.parent_model = this.model;
 
-        // vec3.multiply( obj.model.parent_scale, this.model.scale, this.model.parent_scale );
-
         obj.model.translate_global( relative_dist );
-
-        this.children.push( obj );
 
         return obj;
     }
 
+    remove_child( obj : M_Object ) {
+
+        obj.model.parent_model = null;
+        const index = this.children.indexOf( obj );
+        this.children.splice( index, 1 );
+    }
+
     add_mesh( mesh : M_Mesh, relative_dist: vec3 = vec3.create() ) : M_Mesh {
+
+        if( mesh.parent != null ) {
+
+            mesh.parent.remove_mesh( mesh );
+        }
 
         mesh.parent = this;
 
         mesh.model.parent_model = this.model;
-
-        // vec3.multiply( mesh.model.parent_scale, this.model.scale, this.model.parent_scale );
 
         mesh.model.translate_global( relative_dist );
 
@@ -58,11 +71,38 @@ export default abstract class M_Object {
         return mesh;
     }
 
-    move() : void {
+    remove_mesh( mesh : M_Mesh ) {
+
+        mesh.model.parent_model = null;
+        const index = this.meshes.indexOf( mesh );
+        this.meshes.splice( index, 1 );
+    }
+
+    remove_self() {
+
+        detach_from_loop( this );
+
+        this.model.parent_model = null;
+
+        const index = this.parent.children.indexOf( this );
+        this.parent.children.splice( index, 1 );
+
+        for( let i=this.children.length-1 ; i>=0 ; i-- ) {
+
+            this.children[ i ].remove_self();
+        }
+
+        for( let i=this.meshes.length-1 ; i>=0 ; i-- ) {
+
+            this.meshes[ i ].remove_self();
+        }
+    }
+
+    move( delta_time : number ) : void {
 
     }
 
-    collide() : void {
+    collide( delta_time : number ) : void {
 
     }
 
@@ -83,5 +123,4 @@ export default abstract class M_Object {
         //  Draw your meshes asynchronously
         return Promise.all( this.meshes.map( (mesh) => mesh.refresh_model( model ) ) );
     }
-
 }

@@ -17,7 +17,7 @@ export default class Lives extends M_Object {
         const size = 50;
 
         // const pos = vec3.fromValues( size/canvas.width - 1, size/canvas.height - 1, 0 );
-        const pos = vec3.fromValues( 1 - (1.5* size)/canvas.width, 1 - (10.5 * size)/canvas.height, 0 );
+        const pos = vec3.fromValues( 1 - (3.5* size)/canvas.width, 1 - (12.5 * size)/canvas.height, 0 );
         this.model.translate( pos );
         this.model.rotateZ( 180 );
 
@@ -44,12 +44,8 @@ export default class Lives extends M_Object {
         for( let mesh of this.meshes ) {
 
             mesh.model.rotateY( Math.cos( 3 * time_passed ) * 60 * delta_time );
+            mesh.model.translate_global( vec3.fromValues(0, Math.cos( 3 * time_passed ) * 0.1 * delta_time, 0 ) );
             // mesh.model.rotateY( 6 * delta_time );
-        }
-
-        if( Controller.depth_debug ) {
-
-            this.lost_one();
         }
     }
 

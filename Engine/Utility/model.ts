@@ -83,9 +83,13 @@ export default class Model {
 
     translate( v3 : vec3 ) {
 
-        const relative_dist = vec3.fromValues( 0, 0,0 );
+        let relative_scale : vec3 = vec3.create();
+        vec3.multiply( relative_scale, this.scale, this.parent_model.get_scale() );
 
+        const relative_dist = vec3.fromValues( 0, 0,0 );
         vec3.transformMat4( relative_dist, v3, mat4.fromQuat(mat4.create(), this.rotation) );
+
+        vec3.divide( v3, relative_dist, relative_scale );
 
         vec3.add( this.translation, this.translation, relative_dist );
 

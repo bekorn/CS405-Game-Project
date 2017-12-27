@@ -17,7 +17,7 @@ import Light from "./Essentials/light.js";
 import UI from "./Essentials/ui.js";
 import UIElement from "./Essentials/ui_element.js";
 
-import game_setup from "../Game/game.js";
+import { game_setup } from "../Game/game.js";
 import ShadowMap from "./Utility/shadow_map.js";
 
 
@@ -39,7 +39,7 @@ export let scene : Scene;
 export let camera : Camera;
 export let light : Light;
 
-export let time : number = Date.now() / 1000;
+export let time : number;
 export let time_passed : number = 0;
 
 export let ui : UI;
@@ -58,6 +58,9 @@ export default class Engine {
 
         await Engine.initialize_basics();
         await game_setup();
+
+        time = Date.now() / 1000;
+
         await Engine.cycle();
     }
 
@@ -95,21 +98,17 @@ export default class Engine {
 
         //  Initialize the scene
         scene = new Scene();
-        attach_to_loop( scene );
-
-        //  Create the projection matrix of the camera
-        const camera_projection_matrix = mat4.perspective( mat4.create(), glMatrix.toRadian(36), canvas.width / canvas.height, 50, 1400 );
 
         //  Initialize the camera
-        const eye = vec3.fromValues(0, 0,800);
+        const eye = vec3.fromValues(0, 0,50);
         const target = vec3.fromValues(0,0,0);
-        camera = new Camera( eye, target, camera_projection_matrix );
+        camera = new Camera( eye, target, canvas.width / canvas.height, 0.5, 100 );
         camera.model.translate_global( eye );
         attach_to_loop( camera );
 
 
         //  Initialize light
-        light = new Light( vec3.fromValues( 0,0,500 ), ShadowMap.width, ShadowMap.height );
+        light = new Light( vec3.fromValues( 0,0,-120 ), ShadowMap.width, ShadowMap.height, 10, 10, 300 );
         attach_to_loop( light );
 
 
@@ -140,25 +139,28 @@ export default class Engine {
         time_passed += delta_time;
 
 
-        for( const obj of objects ) {
-            obj.move();
+
+        for( let i=0 ; i<objects.length ; i++ ) {
+            objects[ i ].update( delta_time );
         }
 
-        for( const obj of objects ) {
-            obj.collide();
+        for( let i=0 ; i<objects.length ; i++ ) {
+            !objects[ i ]  ||  objects[ i ].collide( delta_time );
         }
 
-        for( const obj of objects ) {
-            obj.update( delta_time );
-        }
+        //  Clear deleted objs
+        objects = objects.filter( obj => obj );
 
+        for( let i=0 ; i<objects.length ; i++ ) {
+            objects[ i ].move( delta_time );
+        }
 
         await scene.refresh_model();
 
 
         //  Draw to Shadow Map
         gl.viewport( 0, 0, ShadowMap.width, ShadowMap.height );
-        light.refresh_matrices( ShadowMap.width, ShadowMap.height );
+        light.refresh_matrices();
         projection_matrix = light.projection_matrix;
         view_matrix = light.view_matrix;
         gl.cullFace( gl.FRONT );
@@ -173,12 +175,13 @@ export default class Engine {
         gl.viewport( 0, 0, canvas.dom.width, canvas.dom.height );
         gl.cullFace( gl.BACK );
         gl.bindFramebuffer( gl.FRAMEBUFFER, null );
-        gl.clearColor( 0.4, 0.8, 1, 1.0 );
+        // gl.clearColor( 0.4, 0.8, 1, 1.0 );
+        gl.clearColor( 1,1,1, 1.0 );
         gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
         shader.render();
 
 
-        if( Controller.depth_debug ) {
+        if( Controller.keys[ 'depth_debug' ].just_pressed ) {
 
             shadowmap_debug.toggle_visibility();
         }
@@ -190,6 +193,7 @@ export default class Engine {
         gl.clear( gl.DEPTH_BUFFER_BIT );
         ui_shader.render();
 
+        Controller.clear_just_pressed_keys();
 
         if( ! Engine.is_paused ) {
 
@@ -214,4 +218,12 @@ export default class Engine {
 
 export function attach_to_loop( new_obj : M_Object ) {
     objects.push( new_obj );
+}
+
+export function detach_from_loop( obj : M_Object ) {
+    objects[ objects.indexOf( obj ) ] = null;
+}
+
+export function reset_time() {
+    time_passed = 0;
 }

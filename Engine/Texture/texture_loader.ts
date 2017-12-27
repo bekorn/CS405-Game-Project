@@ -5,12 +5,15 @@ export default class TextureLoader {
     static loaded_textures : { [key: string] : WebGLTexture } = {};
 
     static to_load : string[][] = [
-        [ 'mlg_frog', 'jpg' ],
-        [ 'creeper', 'jpg' ],
-        [ 'kreygasm', 'jpg' ],
-        [ 'simple', 'jpg' ],
-        [ 'krabs', 'jpg' ],
         [ 'heart', 'png' ],
+        [ 'Brick Wall', 'jpg' ],
+        [ 'Wooden Floor', 'png' ],
+        [ 'Wooden Box', 'png' ],
+        [ 'Wooden Box Damaged', 'jpg' ],
+        [ 'brushed metal', 'jpg' ],
+        [ 'galvanized plate with bolts', 'jpg' ],
+        [ 'galvanized plate', 'jpg' ],
+        [ 'Stone texture', 'jpg' ],
     ];
 
     static extension : EXT_texture_filter_anisotropic;
@@ -34,8 +37,11 @@ export default class TextureLoader {
                     gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE,
                     image );
 
-                gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
-                gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
+                // gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
+                // gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
+                gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT );
+                gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT );
+
                 gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR );
                 gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR );
                 gl.texParameterf( gl.TEXTURE_2D, TextureLoader.extension.TEXTURE_MAX_ANISOTROPY_EXT, TextureLoader.max_anisotropic );

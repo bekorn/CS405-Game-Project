@@ -1,3 +1,8 @@
+type key_status = {
+    is_down : boolean,
+    just_pressed : boolean,
+};
+
 export class Controller {
 
     static key_map : { [key_code : number] : string } = {
@@ -17,30 +22,50 @@ export class Controller {
 
         32 : 'space',
     };
-    static left : Boolean = false;
-    static up : Boolean = false;
-    static right : Boolean = false;
-    static down : Boolean = false;
-    static depth_debug : Boolean = false;
-    static w : Boolean = false;
-    static a : Boolean = false;
-    static s : Boolean = false;
-    static d : Boolean = false;
-    static q : Boolean = false;
-    static e : Boolean = false;
-    static space : Boolean = false;
+
+    static keys : key_status[] = [];
 
     static init_controller() {
+
+        for( const key of Object.keys( Controller.key_map ) ) {
+
+            Controller.keys[ Controller.key_map[ key ] ] = {
+                is_down : false,
+                just_pressed : false
+            };
+        }
+
+        console.log( Controller.keys );
+
         window.addEventListener( 'keydown', ( event ) => {
 
             const key_name = Controller.key_map[ event.keyCode ];
-            Controller[ key_name ] = true;
+
+            if( key_name in Controller.keys ) {
+
+                if( ! Controller.keys[ key_name ].is_down ) {
+
+                    Controller.keys[ key_name ].just_pressed = true;
+                }
+
+                Controller.keys[ key_name ].is_down = true;
+            }
         } );
 
         window.addEventListener( 'keyup', ( event ) => {
 
             const key_name = Controller.key_map[ event.keyCode ];
-            Controller[ key_name ] = false;
+
+            if( key_name in Controller.keys ) {
+                Controller.keys[key_name].is_down = false;
+            }
         } );
+    }
+
+    static clear_just_pressed_keys() {
+
+        for( let key in Controller.keys ) {
+            Controller.keys[ key ].just_pressed = false;
+        }
     }
 }

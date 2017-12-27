@@ -1,5 +1,5 @@
 import M_Object from "../Object/M_Object.js";
-import {vec3, mat4} from "../Utility/GL/gl-matrix.js";
+import {vec3, mat4, glMatrix} from "../Utility/GL/gl-matrix.js";
 import {Controller} from "../Utility/controller.js";
 
 export default class Camera extends M_Object {
@@ -8,12 +8,16 @@ export default class Camera extends M_Object {
     view_matrix : mat4 = mat4.create();
     following : M_Object = null;
     target : vec3;
-    dist : vec3 = vec3.fromValues( 400, 400, 500 );
+    near : number;
+    far : number;
 
-    constructor( eye : vec3, target: vec3, projection_matrix : mat4 ) {
+    constructor( eye : vec3, target: vec3, ratio : number, near : number, far : number ) {
         super();
 
-        this.projection_matrix = projection_matrix;
+        this.near = near;
+        this.far = far;
+        //  Create the projection matrix of the camera
+        this.projection_matrix = mat4.perspective( mat4.create(), glMatrix.toRadian(36), ratio, near, far );
 
         this.target = target;
         mat4.lookAt( this.view_matrix, eye, target, vec3.fromValues(0,1,0) );
@@ -26,28 +30,24 @@ export default class Camera extends M_Object {
         this.following = obj;
     }
 
-    update() : void {
+    unfollow() {
+        this.following = null;
+    }
+
+    update( delta_time ) : void {
         if( this.following ) {
             this.target = this.following.model.global_position();
         }
-
-        // const pos = this.model.global_position();
-        // mat4.lookAt( this.view_matrix, pos, vec3.add( vec3.fromValues(0,0,0), this.target, vec3.fromValues(0,pos[1]-200,0) ), vec3.fromValues(0,1,0) );
 
         // const corrected_up = vec3.transformQuat( vec3.fromValues(0,0,0), vec3.fromValues(0,1,0), this.model.rotation );
         const corrected_up = vec3.fromValues(0,1,0);
         mat4.lookAt( this.view_matrix, this.model.global_position(), this.target, corrected_up );
 
-        // const self_pos = vec3.add( vec3.fromValues(0,0,0), this.target, this.dist );
-        // mat4.lookAt( this.view_matrix, self_pos, this.target, vec3.fromValues(0,1,0) );
-
-        if (Controller.e == true) {
-            // this.model.rotate_globalX( 1 );
-            this.model.translate(vec3.fromValues(0, 0, -4));
+        if( Controller.keys[ 'e' ].is_down ) {
+            this.model.translate(vec3.fromValues(0, 0, -20 * delta_time));
         }
-        if (Controller.q == true) {
-            // this.model.rotate_globalX( 1 );
-            this.model.translate(vec3.fromValues(0, 0, 4));
+        if( Controller.keys[ 'q' ].is_down ) {
+            this.model.translate(vec3.fromValues(0, 0, 20 * delta_time));
         }
     }
 }

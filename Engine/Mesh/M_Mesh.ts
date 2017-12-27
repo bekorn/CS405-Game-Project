@@ -1,9 +1,8 @@
 import {vec3, mat4} from "../Utility/GL/gl-matrix.js";
-import M_Shader from "../Shader/M_shader.js";
 import Model from "../Utility/model.js";
 import M_Object from "../Object/M_Object.js";
 import TextureLoader from "../Texture/texture_loader.js";
-import { VAO } from "./mesh_loader.js";
+import AABB from "../Physics/AABB.js";
 
 export default abstract class M_Mesh {
 
@@ -13,6 +12,7 @@ export default abstract class M_Mesh {
     parent : M_Object = null;
     model : Model = new Model( this );
     frame_model : mat4 = mat4.create();
+    bbox : AABB = null;
 
     texture : WebGLTexture;
 
@@ -27,6 +27,12 @@ export default abstract class M_Mesh {
         this.texture = texture;
     }
 
+    remove_self() {
+
+        const index = this.parent.meshes.indexOf( this );
+        this.parent.meshes.splice( index, 1 );
+    }
+
     async refresh_model( parent_model : mat4 ) {
         // console.log( "Drawing SHAPE:"+ this.id );
 
@@ -34,4 +40,14 @@ export default abstract class M_Mesh {
 
         mat4.multiply( this.frame_model, model, this.model.get_model() );
     };
+
+    attach_bbox( dimensions : vec3 ) {
+
+        this.bbox = new AABB( this.model.global_position(), dimensions );
+    }
+
+    update_bbox() {
+
+        this.bbox.update_pos( this.model.global_position() );
+    }
 }

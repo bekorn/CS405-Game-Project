@@ -29,6 +29,14 @@ export default class UIElement extends M_Mesh {
         this.model.translate_global( vec3.fromValues( pos[0], pos[1], depth ) );
     }
 
+    remove_self() {
+
+        super.remove_self();
+
+        const index = UIElement.instance_list.indexOf( this );
+        UIElement.instance_list.splice( index, 1 );
+    }
+
     toggle_visibility() {
 
         this.model.rotateY( 180 );

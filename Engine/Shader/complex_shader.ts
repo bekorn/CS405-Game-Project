@@ -26,6 +26,7 @@ export default class ComplexShader extends M_Shader {
             
             out vec3 originalPos;
             out vec4 worldPos;
+            out vec4 modelViewPos;
             out vec3 normal;
             out vec2 uvmap;
             
@@ -34,7 +35,10 @@ export default class ComplexShader extends M_Shader {
             
             void main() {
             
-                uvmap = aUVMap;
+                vec4 tranlatedUV = uModelMatrix * vec4( aUVMap * 2.0 - 1.0, 0.0, 0.0 );
+//                tranlatedUV /= tranlatedUV.w;
+                uvmap = ( tranlatedUV.xy + 1.0) / 2.0;
+//                uvmap = aUVMap;
                 
                 mat4 depthScaleMatrix = mat4(0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.5, 0.5, 1.0);
                 
@@ -47,6 +51,9 @@ export default class ComplexShader extends M_Shader {
                 
                 worldPos = uModelMatrix * vec4( aVertexPosition, 1.0 );
                 worldPos /= worldPos.w;
+                
+                modelViewPos = uViewMatrix * worldPos;
+                modelViewPos /= modelViewPos.w;
                 
                 vec4 normalPos = uModelMatrix * vec4( aVertexPosition + aNormal, 1.0 );
                 normalPos /= normalPos.w;
@@ -64,6 +71,7 @@ export default class ComplexShader extends M_Shader {
             
             uniform vec3 uLightPos;
             uniform vec3 uCameraPos;
+            uniform float uCameraFar;
             
             uniform vec3 uMaterialColour;
             uniform float uSpecularFactor;
@@ -74,6 +82,7 @@ export default class ComplexShader extends M_Shader {
             
             in vec3 originalPos;
             in vec4 worldPos;
+            in vec4 modelViewPos;
             in vec3 normal;
             in vec2 uvmap;
             
@@ -226,6 +235,16 @@ export default class ComplexShader extends M_Shader {
             }
 */
             void main() {
+
+                float fog_start = uCameraFar / 4.0;
+                float fog_end = uCameraFar;
+                float frag_coord = length( modelViewPos );
+                
+                
+                float d = 1.0 - clamp( (fog_end - frag_coord) / (fog_end - fog_start), 0.0, 1.0 );
+                float fade_factor = d;
+            
+            
             
                 vec3 light_colour = vec3( 1.0 );
                 vec3 texture_colour = texture( uTexture, uvmap ).rgb;
@@ -240,7 +259,7 @@ export default class ComplexShader extends M_Shader {
                 float dotNL = dot( lightDir, normal );
                 
                 //  Ambient Lighting
-                ambient = 0.1;
+                ambient = 0.5;
                 
                 if( dotNL > 0.0 )
                 {
@@ -270,7 +289,7 @@ export default class ComplexShader extends M_Shader {
                 
                 colour = (texture_colour * (ambient + (diffuse * visibility))) + (specular * visibility);
                 
-                out_colour = vec4( colour, 1.0 );
+                out_colour = vec4( mix( colour, vec3(1.0), fade_factor ), 1.0 );
             }
         `;
     }
@@ -288,6 +307,7 @@ export default class ComplexShader extends M_Shader {
 
         light_position : 'uLightPos',
         camera_position : 'uCameraPos',
+        camera_far : 'uCameraFar',
 
         colour : 'uMaterialColour',
         specular : 'uSpecularFactor',
@@ -338,6 +358,7 @@ export default class ComplexShader extends M_Shader {
 
         gl.uniform3fv( this.bindings.light_position, new Float32Array( light.model.global_position() ) );
         gl.uniform3fv( this.bindings.camera_position, new Float32Array( camera.model.global_position() ) );
+        gl.uniform1f( this.bindings.camera_far, camera.far );
 
 
         //  Enable attributes
