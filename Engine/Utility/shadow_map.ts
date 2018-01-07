@@ -77,14 +77,9 @@ export default class ShadowMap {
         gl.bindTexture( gl.TEXTURE_2D, ShadowMap.depth );
 
         //  HIGH Precision
-        // internalFormat = gl.DEPTH_COMPONENT32F;
-        // format = gl.DEPTH_COMPONENT;
-        // type = gl.FLOAT;
-
-
-        internalFormat = gl.DEPTH_COMPONENT16;
+        internalFormat = gl.DEPTH_COMPONENT32F;
         format = gl.DEPTH_COMPONENT;
-        type = gl.UNSIGNED_INT;
+        type = gl.FLOAT;
 
         gl.texImage2D( gl.TEXTURE_2D, 0, internalFormat,
             textureWidth, textureHeight, 0,

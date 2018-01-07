@@ -100,7 +100,7 @@ export default class AABB {
                 const center_dist = Math.abs( this.center[i] - bbox.center[i] );
                 const edge_dist = center_dist - this.dimensions[i] - bbox.dimensions[i];
 
-                velocity[i] = Math.sign( velocity[i] ) * edge_dist;
+                velocity[i] = Math.sign( velocity[i] ) * (edge_dist * 0.99999999);
             }
         }
     }

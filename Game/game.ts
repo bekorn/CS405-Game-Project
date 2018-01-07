@@ -1,4 +1,4 @@
-import Engine, { attach_to_loop, camera, reset_time } from "../Engine/engine.js";
+import Engine, { attach_to_loop, camera, reset_delta_time, reset_time } from "../Engine/engine.js";
 import Lives from "./Objects/lives.js";
 import Player from "./Objects/player.js";
 import Hall from "./Objects/hall.js";
@@ -37,7 +37,7 @@ export function game_setup() {
 
     hall = new Hall( hall_width, hall_height, hall_length );
 
-    spawner = new BoxSpawner( 1400 );
+    spawner = new BoxSpawner( 2000 );
     attach_to_loop( spawner );
 
     lives = new Lives();
@@ -57,6 +57,7 @@ export function game_end() {
 export function game_restart() {
 
     game_end();
-    reset_time();
     game_setup();
+    reset_time();
+    // reset_delta_time();
 }

@@ -1,7 +1,6 @@
 import {gl} from "../engine.js";
-import M_Object from "../Object/M_Object";
 import M_Mesh from "../Mesh/M_Mesh";
-import { VAO } from "../Mesh/mesh_loader";
+import { VAOWrapper } from "../Mesh/mesh_loader";
 
 export default abstract class M_Shader {
 
@@ -61,17 +60,25 @@ export default abstract class M_Shader {
     //  Does the bindings listed in binding_map
     protected bind_program() {
 
-        for( let key in this.binding_map ) {
+        for( const binding in this.binding_map ) {
 
-            const location = this.binding_map[ key ];
+            const location = this.binding_map[ binding ];
 
-            if( location[0] == 'a' ) {  //  It is an attribute location
+            if( location[0] == 'aVertexPosition' ) {
 
-                this.bindings[ key ] = gl.getAttribLocation( this.program, location );
+                gl.bindAttribLocation( this.program, 0, location );
+            }
+            else if( location[0] == 'aNormal' ) {
+
+                gl.bindAttribLocation( this.program, 1, location );
+            }
+            else if( location[0] == 'aUVMap' ) {
+
+                gl.bindAttribLocation( this.program, 2, location );
             }
             else if( location[0] == 'u' ) {
 
-                this.bindings[ key ] = gl.getUniformLocation( this.program, location );
+                this.bindings[ binding ] = gl.getUniformLocation( this.program, location );
             }
         }
     }
@@ -84,7 +91,7 @@ export default abstract class M_Shader {
     protected abstract frame_bindings();
 
     //  Binds variables that are same for a class
-    protected abstract class_bindings( vao : VAO, instances : M_Mesh[]  );
+    protected abstract class_bindings( vao_wrapper : VAOWrapper, instances : M_Mesh[]  );
 
     //  Binds variables that are same for a mesh (singleton)
     protected abstract instance_bindings( instance : M_Mesh );

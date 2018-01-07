@@ -1,9 +1,9 @@
 import M_Shader from "./M_shader.js";
 import M_Mesh from "../Mesh/M_Mesh";
 import { gl } from "../engine.js";
-import { VAO } from "../Mesh/mesh_loader.js";
 import CubeMesh from "../../Game/Meshes/cube.js";
 import { projection_matrix, view_matrix } from "../engine.js";
+import { VAOWrapper } from "../Mesh/mesh_loader.js";
 
 /*
 * Draws the objects depth values to a texture later to be used as a shadow map
@@ -12,10 +12,11 @@ import { projection_matrix, view_matrix } from "../engine.js";
 export default class DepthShader extends M_Shader {
 
     vertex_shader() : string {
-        return `
+        // language=GLSL
+        return `#version 300 es
             precision highp float;
             
-            attribute vec3 aVertexPosition;
+            layout( location = 0 ) in vec3 aVertexPosition;
             
             uniform mat4 uModelMatrix;
             uniform mat4 uViewMatrix;
@@ -29,10 +30,15 @@ export default class DepthShader extends M_Shader {
     }
 
     fragment_shader() : string {
-        return `
+        // language=GLSL
+        return `#version 300 es
+            precision highp float;
+
+            out vec4 out_colour;
+
             void main()
             {
-                gl_FragColor = vec4( 1.0 );
+                out_colour = vec4( 1.0 );
             }
         `;
     }
@@ -83,31 +89,21 @@ export default class DepthShader extends M_Shader {
         //  Send Uniforms
         gl.uniformMatrix4fv( this.bindings.view_matrix, false, new Float32Array( view_matrix ) );
         gl.uniformMatrix4fv( this.bindings.projection_matrix, false, new Float32Array( projection_matrix ) );
-
-
-        //  Enable attributes
-        gl.enableVertexAttribArray( <number>this.bindings.position_attr );
     }
 
-    protected class_bindings( vao : VAO, instances : M_Mesh[] ) {
+    protected class_bindings( vao_wrapper : VAOWrapper, instances : M_Mesh[] ) {
 
-        //  Bind Vertices
-        gl.bindBuffer( gl.ARRAY_BUFFER, vao.vertex_buffer );
-        gl.vertexAttribPointer( <number>this.bindings.position_attr, 3, gl.FLOAT, false, 0, 0);
-        //  TODO: Can these vertexAttribPointer's be in frame bindings?
+        gl.bindVertexArray( vao_wrapper.vao );
 
-        //  Bind Faces (and Draw)
-        gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, vao.faces_buffer );
-
-
-        for( let mesh of instances ) {
+        for( const mesh of instances ) {
 
             this.instance_bindings( mesh );
 
             //  Draw
-            gl.drawElements( gl.TRIANGLES, vao.face_size, gl.UNSIGNED_SHORT, 0 );
+            gl.drawElements( gl.TRIANGLES, vao_wrapper.face_size, gl.UNSIGNED_SHORT, 0 );
         }
 
+        gl.bindVertexArray( null );
     }
 
     protected instance_bindings( instance : M_Mesh ) {

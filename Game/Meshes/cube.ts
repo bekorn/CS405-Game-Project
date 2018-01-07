@@ -12,6 +12,7 @@ export default class CubeMesh extends M_Mesh {
         return MeshLoader.loaded_meshes[ 'cube' ];
     }
 
+    specular = 4096;
     colour = vec3.fromValues( Math.random(), Math.random(), Math.random() );
     texture : WebGLTexture = TextureLoader.loaded_textures[
         TextureLoader.to_load[

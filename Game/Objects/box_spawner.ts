@@ -56,9 +56,9 @@ export default class BoxSpawner extends M_Object {
 
         for( let mesh of this.meshes ) {
 
-            mesh.model.translate_global( vec3.fromValues(0,0,30 * delta_time) );
+            mesh.model.translate_global( vec3.fromValues(0,0,20 * delta_time) );
 
-            if( mesh.model.global_position()[2] > hall.length ) {
+            if( mesh.model.global_position()[2] > hall.length * 2 ) {
 
                 mesh.remove_self();
             }

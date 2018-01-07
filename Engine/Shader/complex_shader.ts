@@ -1,10 +1,9 @@
 import M_Shader from "./M_shader.js";
-import { mat4 } from "../Utility/GL/gl-matrix.js";
 import { camera, gl, light, projection_matrix, view_matrix } from "../engine.js";
 import M_Mesh from "../Mesh/M_Mesh.js";
-import { VAO } from "../Mesh/mesh_loader.js";
 import CubeMesh from "../../Game/Meshes/cube.js";
 import ShadowMap from "../Utility/shadow_map.js";
+import { VAOWrapper } from "../Mesh/mesh_loader.js";
 
 
 export default class ComplexShader extends M_Shader {
@@ -14,9 +13,9 @@ export default class ComplexShader extends M_Shader {
         return `#version 300 es
             precision highp float;
             
-            in vec3 aVertexPosition;
-            in vec3 aNormal;
-            in vec2 aUVMap;
+            layout( location = 0 ) in vec3 aVertexPosition;
+            layout( location = 1 ) in vec3 aNormal;
+            layout( location = 2 ) in vec2 aUVMap;
         
             uniform mat4 uModelMatrix;
             uniform mat4 uViewMatrix;
@@ -90,20 +89,20 @@ export default class ComplexShader extends M_Shader {
             
             out vec4 out_colour;
             
-            float SampleShadowMap( sampler2D shadow_map, vec2 pos, float compare ) {
-                return step( compare, texture( shadow_map, pos ).r );
+            float SampleShadowMap( vec2 pos, float compare ) {
+                return step( compare, texture( uShadowMap, pos ).r );
             }
             
-            float SampleShadowMapLinear( sampler2D shadow_map, vec2 pos, float compare, vec2 texel_size ) {
+            float SampleShadowMapLinear( vec2 pos, float compare, vec2 texel_size ) {
             
                 vec2 pixelPos = (pos / texel_size);
                 vec2 fraction = fract( pixelPos );
                 vec2 bottom_left = (pixelPos - fraction) * texel_size;
                 
-                float bl = SampleShadowMap( shadow_map, bottom_left, compare );
-                float tl = SampleShadowMap( shadow_map, bottom_left + vec2( 0.0, texel_size.y ), compare );
-                float br = SampleShadowMap( shadow_map, bottom_left + vec2( texel_size.x, 0.0 ), compare );
-                float tr = SampleShadowMap( shadow_map, bottom_left + texel_size, compare );
+                float bl = SampleShadowMap( bottom_left, compare );
+                float tl = SampleShadowMap( bottom_left + vec2( 0.0, texel_size.y ), compare );
+                float br = SampleShadowMap( bottom_left + vec2( texel_size.x, 0.0 ), compare );
+                float tr = SampleShadowMap( bottom_left + texel_size, compare );
                 
                 float l_mix = mix( bl, tl, fraction.y );
                 float r_mix = mix( br, tr, fraction.y );
@@ -111,38 +110,35 @@ export default class ComplexShader extends M_Shader {
                 return mix( l_mix, r_mix, fraction.x );
             }
             
-            float SampleShadowMapArea( sampler2D shadow_map, vec2 pos, float compare, vec2 texel_size, float sample_size ) {
+            float SampleShadowMapArea( vec2 pos, float compare, vec2 texel_size, float sample_size ) {
             
                 float shadow = 0.0;
                 
                 float total_samples = sample_size * sample_size;
                 
-                float sample_start = (sample_size - 1.0) / 2.0;
-                
-                float sample_step = ( sample_size - 1.0 ) * 2.0;
+                float range = (sample_size - 1.0) / 2.0;
             
-                for( float x = -sample_start ; x <= sample_start; x++ )
+                for( float x = -range ; x <= range; x++ )
                 {
-                    for( float y = -sample_start ; y <= sample_start ; y++ )
+                    for( float y = -range ; y <= range ; y++ )
                     {
-                        shadow += SampleShadowMap( shadow_map, pos + vec2(x, y) * texel_size * sample_step, compare );
+                        shadow += SampleShadowMap( pos + vec2(x, y) * texel_size, compare );
                     }
                 }
-            
-                shadow /= total_samples;
                 
-                return shadow;
+                return shadow / total_samples;
             }
             
-            float AverageBlockerDistance( sampler2D shadow_map, vec3 pos, float compare, float radius, vec2 texel_size ) {
+            float AverageBlockerDistance( vec2 pos, float compare, float sample_size, vec2 texel_size ) {
             
                 float blockers = 0.0;
                 float distance = 0.0;
+                float range = ( sample_size - 1.0 ) / 2.0;
                 
-                for( float x = -radius; x < radius; x++ ) {
-                    for( float y = -radius; y < radius; y++ ) {
+                for( float x = -range; x <= range; x++ ) {
+                    for( float y = -range; y <= range; y++ ) {
                     
-                        float depth = texture( shadow_map, pos.xy + vec2(x, y) * texel_size ).r;
+                        float depth = texture( uShadowMap, pos + vec2(x, y) * texel_size ).r;
                         if( depth < compare ) {
                             blockers++;
                             distance += depth;
@@ -158,92 +154,32 @@ export default class ComplexShader extends M_Shader {
                 
                     return -1.0;
                 }
-                
             }
             
-            float SmoothShadow( sampler2D shadow_map, vec3 pos, float bias, vec2 texel_size ) {
+            float SmoothShadow() {
             
-                const float light_radius = 1.0;
+                vec2 texel_size = vec2(1.0) / vec2( textureSize( uShadowMap, 0 ) );
+                float avg_dist = AverageBlockerDistance( shadowPos.xy, shadowPos.z, 5.0, texel_size );
                 
-                float closestDepth = texture( shadow_map, pos.xy ).r;
-                float currentDepth = pos.z - (bias * texel_size.x);
-                float diff = currentDepth - closestDepth;
-
-//                float sample_size = clamp( floor( sqrt( diff ) / 0.05 ), 1.0, 9.0 );
-
-//                float radius = 0.1 * (currentDepth - 0.1) / pos.z;
-                float radius = clamp( floor( sqrt( diff ) / 0.03 ), 1.0, 10.0 );
-                
-//                float distance = AverageBlockerDistance( shadow_map, pos, currentDepth, radius, texel_size );
-//                
-//                if( distance == -1.0 ) {
-//                    
-//                    return 1.0;
-//                }
-                
-//                float sample_radius = (pos.z - distance) / distance;
-                
-                return SampleShadowMapArea( shadow_map, pos.xy, currentDepth, texel_size, radius );
-            }
-            
-/*
-            float SampleShadowMap( in sampler2D shadow_map, in vec4 pos ) {
-            
-                float closestDepth = texture( shadow_map, pos.xy ).r;
-            
-                float currentDepth = pos.z;
-            
-                float diff = currentDepth - closestDepth;
-                
-//                float sample_size = min( floor( sqrt( diff ) / 0.001 ), 6.0 );
-                float sample_size;
-
-                if( diff < 0.01 ) {
-                    sample_size = 0.0;
-                }
-                else if( diff < 0.03 ){
-                    sample_size = 2.0;
+                if( avg_dist == -1.0 ) {
+                    return 1.0;
                 }
                 else {
-                    sample_size = 4.0;
+                    const float light_width = 20.0;
+                    float blocker = avg_dist;
+                    float receiver = shadowPos.z - blocker;
+                    float sample_size = light_width * receiver / blocker;
+                    return SampleShadowMapArea( shadowPos.xy, shadowPos.z, texel_size, min( ceil( sample_size ), 40.0 ) );
                 }
-                
-                //  If it is not shadow
-//                if( diff < 0.0 ) {
-//                    sample_size = 1.0;
-//                }
-                
-                float shadow = 0.0;
-                
-                
-                float total_samples = ( sample_size * 2.0 + 1.0 ) * ( sample_size * 2.0 + 1.0 );
-                
-                 vec2 texel_size = vec2( 1.0 ) / float( textureSize( shadow_map, 0 ) );
-            
-                for( float x = -sample_size ; x <= sample_size; x++ )
-                {
-                    for( float y = -sample_size ; y <= sample_size ; y++ )
-                    {
-                        float pcfDepth = texture( shadow_map, pos.xy + vec2(x, y) * texel_size ).r;
-                        shadow += currentDepth > pcfDepth ? 0.0 : 1.0;
-                    }
-                }
-            
-                shadow /= total_samples;
-            
-                return shadow;
             }
-*/
+
             void main() {
 
                 float fog_start = uCameraFar / 4.0;
                 float fog_end = uCameraFar;
                 float frag_coord = length( modelViewPos );
                 
-                
-                float d = 1.0 - clamp( (fog_end - frag_coord) / (fog_end - fog_start), 0.0, 1.0 );
-                float fade_factor = d;
-            
+                float fog_factor = 1.0 - clamp( (fog_end - frag_coord) / (fog_end - fog_start), 0.0, 1.0 );
             
             
                 vec3 light_colour = vec3( 1.0 );
@@ -259,7 +195,7 @@ export default class ComplexShader extends M_Shader {
                 float dotNL = dot( lightDir, normal );
                 
                 //  Ambient Lighting
-                ambient = 0.5;
+                ambient = 0.3;
                 
                 if( dotNL > 0.0 )
                 {
@@ -282,19 +218,21 @@ export default class ComplexShader extends M_Shader {
                 }
                 else {
                 
-                    vec2 texel_size = vec2(1.0) / vec2( textureSize( uShadowMap, 0 ) );
-//                    visibility = SmoothShadow( uShadowMap, shadowPos.xyz, 0.0, texel_size );
-                    visibility = SampleShadowMapLinear( uShadowMap, shadowPos.xy, shadowPos.z - texel_size.x, texel_size );
+                    visibility = SmoothShadow();
                 }
                 
+                //  Blend light values
                 colour = (texture_colour * (ambient + (diffuse * visibility))) + (specular * visibility);
                 
-                out_colour = vec4( mix( colour, vec3(1.0), fade_factor ), 1.0 );
+                //  Fog effect
+                colour = mix( colour, vec3(0.0), fog_factor );
+                
+                out_colour = vec4( colour, 1.0 );
             }
         `;
     }
 
-    binding_map : { [key: string]: any } = {
+    binding_map : { [key: string]: string } = {
         position_attr : 'aVertexPosition',
         normal_attr : 'aNormal',
         uvmap_attr: 'aUVMap',
@@ -361,43 +299,25 @@ export default class ComplexShader extends M_Shader {
         gl.uniform1f( this.bindings.camera_far, camera.far );
 
 
-        //  Enable attributes
-        gl.enableVertexAttribArray( <number>this.bindings.position_attr );
-        gl.enableVertexAttribArray( <number>this.bindings.normal_attr );
-        gl.enableVertexAttribArray( <number>this.bindings.uvmap_attr );
-
-
         //  Activate and Bind Shadow Map
         gl.uniform1i( this.bindings.shadow_map, 1 );        //  Set texture1 shadow map
         gl.activeTexture( gl.TEXTURE1 );                       //  Use shadow map
         gl.bindTexture( gl.TEXTURE_2D, ShadowMap.depth );
     }
 
-    protected class_bindings( vao : VAO, instances : M_Mesh[] ) {
+    protected class_bindings( vao_wrapper : VAOWrapper, instances : M_Mesh[] ) {
 
-        //  Bind Vertices
-        gl.bindBuffer( gl.ARRAY_BUFFER, vao.vertex_buffer );
-        gl.vertexAttribPointer( <number>this.bindings.position_attr, 3, gl.FLOAT, false, 0, 0);
+        gl.bindVertexArray( vao_wrapper.vao );
 
-        //  Bind Normals
-        gl.bindBuffer( gl.ARRAY_BUFFER, vao.normal_buffer );
-        gl.vertexAttribPointer( <number>this.bindings.normal_attr, 3, gl.FLOAT, false, 0, 0);
-
-        //  Bind UV Map
-        gl.bindBuffer( gl.ARRAY_BUFFER, vao.uvmap_buffer );
-        gl.vertexAttribPointer( <number>this.bindings.uvmap_attr, 2, gl.FLOAT, false, 0, 0 );
-
-        //  Bind Faces (and Draw)
-        gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, vao.faces_buffer );
-
-
-        for( let mesh of instances ) {
+        for( const mesh of instances ) {
 
             this.instance_bindings( mesh );
 
             //  Draw
-            gl.drawElements( gl.TRIANGLES, vao.face_size, gl.UNSIGNED_SHORT, 0 );
+            gl.drawElements( gl.TRIANGLES, vao_wrapper.face_size, gl.UNSIGNED_SHORT, 0 );
         }
+
+        gl.bindVertexArray( null );
     }
 
     protected instance_bindings( instance : M_Mesh ) {

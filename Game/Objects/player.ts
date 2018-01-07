@@ -14,7 +14,7 @@ export default class Player extends M_Object {
     velocity : vec3;
     reverse : number = 1;
 
-    speed : number = 8;
+    speed : number = 16;
 
     damaged : boolean = false;
 

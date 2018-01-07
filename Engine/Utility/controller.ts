@@ -35,8 +35,6 @@ export class Controller {
             };
         }
 
-        console.log( Controller.keys );
-
         window.addEventListener( 'keydown', ( event ) => {
 
             const key_name = Controller.key_map[ event.keyCode ];

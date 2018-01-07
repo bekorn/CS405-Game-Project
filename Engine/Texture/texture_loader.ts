@@ -7,13 +7,13 @@ export default class TextureLoader {
     static to_load : string[][] = [
         [ 'heart', 'png' ],
         [ 'Brick Wall', 'jpg' ],
-        [ 'Wooden Floor', 'png' ],
+        [ 'Wooden Floor', 'jpg' ],
         [ 'Wooden Box', 'png' ],
         [ 'Wooden Box Damaged', 'jpg' ],
-        [ 'brushed metal', 'jpg' ],
         [ 'galvanized plate with bolts', 'jpg' ],
         [ 'galvanized plate', 'jpg' ],
         [ 'Stone texture', 'jpg' ],
+        [ 'HardMetal', 'jpg' ],
     ];
 
     static extension : EXT_texture_filter_anisotropic;

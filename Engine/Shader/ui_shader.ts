@@ -1,9 +1,8 @@
 import M_Shader from "./M_shader.js";
 import M_Mesh from "../Mesh/M_Mesh";
 import { gl } from "../engine.js";
-import ShadowMap from "../Utility/shadow_map.js";
-import { VAO } from "../Mesh/mesh_loader.js";
 import UIElement from "../Essentials/ui_element.js";
+import { VAOWrapper } from "../Mesh/mesh_loader.js";
 
 /*
 * Draws the given texture into the scene
@@ -12,16 +11,17 @@ import UIElement from "../Essentials/ui_element.js";
 export default class UIShader extends M_Shader {
 
     vertex_shader() : string {
-        return `
+        // language=GLSL
+        return `#version 300 es
             precision highp float;
             
-            attribute vec3 aVertexPosition;
-            attribute vec2 aUVMap;
+            layout( location = 0 ) in vec3 aVertexPosition;
+            layout( location = 2 ) in vec2 aUVMap;
             
             uniform mat4 uModelMatrix;
             
-            varying vec3 pos;
-            varying vec2 uvmap;
+            out vec3 pos;
+            out vec2 uvmap;
             
             void main() {
             
@@ -34,24 +34,27 @@ export default class UIShader extends M_Shader {
     }
 
     fragment_shader() : string {
-        return `
+        // language=GLSL
+        return `#version 300 es
             precision highp float;
             precision highp sampler2D;
             
             uniform sampler2D uTextureSampler;
             
-            varying vec3 pos;
-            varying vec2 uvmap;
+            in vec3 pos;
+            in vec2 uvmap;
+            
+            out vec4 out_colour;
             
             void main()
             {
-                vec4 tex =  texture2D( uTextureSampler, uvmap );
+                vec4 tex =  texture( uTextureSampler, uvmap );
                 
                 if( tex.a < 0.5 ) {
                     discard;
                 }
                 else {
-                    gl_FragColor = vec4( tex.rgb, 1.0 );
+                    out_colour = vec4( tex.rgb, 1.0 );
                 }
                 
                 // gl_FragColor = vec4( pos, 1.0 );
@@ -103,23 +106,19 @@ export default class UIShader extends M_Shader {
         gl.useProgram( this.program );
     }
 
-    protected class_bindings( vao : VAO, instances : M_Mesh[]  ) {
+    protected class_bindings( vao_wrapper : VAOWrapper, instances : M_Mesh[]  ) {
 
-        //  Send vertices
-        gl.bindBuffer( gl.ARRAY_BUFFER, vao.vertex_buffer );
-        gl.vertexAttribPointer( <number>this.bindings.position_attr, 3, gl.FLOAT, false, 0, 0 );
+        gl.bindVertexArray( vao_wrapper.vao );
 
-        //  Send uv map
-        gl.bindBuffer( gl.ARRAY_BUFFER, vao.uvmap_buffer );
-        gl.vertexAttribPointer( <number>this.bindings.uvmap_attr, 2, gl.FLOAT, false, 0, 0 );
-
-        for( let mesh of instances ) {
+        for( const mesh of instances ) {
 
             this.instance_bindings( mesh );
 
             //  Draw
-            gl.drawElements( gl.TRIANGLES, vao.face_size, gl.UNSIGNED_SHORT, 0 );
+            gl.drawElements( gl.TRIANGLES, vao_wrapper.face_size, gl.UNSIGNED_SHORT, 0 );
         }
+
+        gl.bindVertexArray( null );
     }
 
     protected instance_bindings( instance : M_Mesh ) {

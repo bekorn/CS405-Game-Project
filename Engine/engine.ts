@@ -41,6 +41,7 @@ export let light : Light;
 
 export let time : number;
 export let time_passed : number = 0;
+let delta_time : number;
 
 export let ui : UI;
 let shadowmap_debug : UIElement;
@@ -73,10 +74,9 @@ export default class Engine {
 
         //  Configure gl
         gl.enable( gl.DEPTH_TEST) ;
-        gl.depthFunc( gl.LEQUAL );
         gl.enable( gl.CULL_FACE );
 
-        console.log(gl.getContextAttributes() );
+        console.log( gl.getContextAttributes() );
 
         //  Initialize shaders
         shader = ComplexShader.initialize();
@@ -108,7 +108,7 @@ export default class Engine {
 
 
         //  Initialize light
-        light = new Light( vec3.fromValues( 0,0,-120 ), ShadowMap.width, ShadowMap.height, 10, 10, 300 );
+        light = new Light( vec3.fromValues( 0,0,120 ), ShadowMap.width, ShadowMap.height, 30, 30, 300 );
         attach_to_loop( light );
 
 
@@ -134,10 +134,9 @@ export default class Engine {
     static async cycle() {
 
         const  new_time = Date.now() / 1000;
-        const delta_time = new_time - time;
+        delta_time = new_time - time;
         time = new_time;
         time_passed += delta_time;
-
 
 
         for( let i=0 ; i<objects.length ; i++ ) {
@@ -155,14 +154,16 @@ export default class Engine {
             objects[ i ].move( delta_time );
         }
 
+
         await scene.refresh_model();
 
 
         //  Draw to Shadow Map
-        gl.viewport( 0, 0, ShadowMap.width, ShadowMap.height );
         light.refresh_matrices();
+        gl.depthFunc( gl.LEQUAL );
         projection_matrix = light.projection_matrix;
         view_matrix = light.view_matrix;
+        gl.viewport( 0, 0, ShadowMap.width, ShadowMap.height );
         gl.cullFace( gl.FRONT );
         gl.bindFramebuffer( gl.FRAMEBUFFER, ShadowMap.frame_buffer );
         gl.clear( gl.DEPTH_BUFFER_BIT );
@@ -175,9 +176,8 @@ export default class Engine {
         gl.viewport( 0, 0, canvas.dom.width, canvas.dom.height );
         gl.cullFace( gl.BACK );
         gl.bindFramebuffer( gl.FRAMEBUFFER, null );
-        // gl.clearColor( 0.4, 0.8, 1, 1.0 );
-        gl.clearColor( 1,1,1, 1.0 );
-        gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+        gl.clearColor( 0,0,0, 1.0 );
+        gl.clear( gl.COLOR_BUFFER_BIT );
         shader.render();
 
 
@@ -186,14 +186,15 @@ export default class Engine {
             shadowmap_debug.toggle_visibility();
         }
 
-
         await ui.refresh_model();
 
         gl.cullFace( gl.FRONT );
-        gl.clear( gl.DEPTH_BUFFER_BIT );
+        gl.depthFunc( gl.ALWAYS );
         ui_shader.render();
 
+
         Controller.clear_just_pressed_keys();
+
 
         if( ! Engine.is_paused ) {
 
@@ -226,4 +227,8 @@ export function detach_from_loop( obj : M_Object ) {
 
 export function reset_time() {
     time_passed = 0;
+}
+
+export function reset_delta_time() {
+    delta_time = 0;
 }
